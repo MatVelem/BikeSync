@@ -91,14 +91,16 @@ const styles = StyleSheet.create({
     marginBottom: 20, 
   },
   title: {
+
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#000000',
     textAlign: 'left',
+    marginTop: -20
   },
   subtitle: {
     fontSize: 16,
-    color: '#fff',
+    color: '#000000',
     marginBottom: 30,
     textAlign: 'left',
   },

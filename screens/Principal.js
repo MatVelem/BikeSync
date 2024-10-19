@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
-const HomeScreen = () => {
+const Principal = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {/* Cabeçalho com logotipo e ícones */}
@@ -12,11 +12,11 @@ const HomeScreen = () => {
         />
         <View style={styles.icons}>
           <Image
-            source={{ uri: '../assets/usuario.png' }} // Substitua pelo link do ícone de conversa
+            source={{ uri: '../assets/usuario.png' }} // Substitua pelo link correto do ícone de usuário
             style={styles.icon}
           />
           <Image
-            source={{ uri: 'https://link-do-icone-perfil.com/icone.png' }} // Substitua pelo link do ícone de perfil
+            source={{ uri: 'https://link-do-icone-perfil.com/icone.png' }} // Substitua pelo link correto do ícone de perfil
             style={styles.icon}
           />
         </View>
@@ -24,17 +24,23 @@ const HomeScreen = () => {
 
       {/* Saudação e nome do usuário */}
       <View style={styles.welcomeContainer}>
-        <Text style={styles.welcomeText}>Bem vindo!</Text>
+        <Text style={styles.welcomeText}>Bem-vindo!</Text>
         <Text style={styles.userName}>Usuário</Text>
       </View>
 
       {/* Botão "Minhas Bicicletas" */}
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate('MinhasBicicletas')} // Navega para MinhasBicicletasScreen
+      >
         <Text style={styles.buttonText}>Minhas Bicicletas</Text>
       </TouchableOpacity>
 
       {/* Botão "Adicionar Nova Bicicleta" */}
-      <TouchableOpacity style={styles.addButton}>
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => navigation.navigate('AdicionarBicicleta')} // Navega para AdicionarBicicletaScreen
+      >
         <Text style={styles.addButtonText}>ADICIONAR NOVA BICICLETA +</Text>
       </TouchableOpacity>
 
@@ -42,25 +48,25 @@ const HomeScreen = () => {
       <View style={styles.navigationBar}>
         <TouchableOpacity>
           <Image
-            source={{ uri: 'https://link-do-icone-casa.com/icone.png' }} // Substitua pelo link do ícone da casa
+            source={{ uri: 'https://link-do-icone-casa.com/icone.png' }} // Substitua pelo link correto do ícone da casa
             style={styles.navIcon}
           />
         </TouchableOpacity>
         <TouchableOpacity>
           <Image
-            source={{ uri: 'https://link-do-icone-loja.com/icone.png' }} // Substitua pelo link do ícone da loja
+            source={{ uri: 'https://link-do-icone-loja.com/icone.png' }} // Substitua pelo link correto do ícone da loja
             style={styles.navIcon}
           />
         </TouchableOpacity>
         <TouchableOpacity>
           <Image
-            source={{ uri: 'https://link-do-icone-bicicleta.com/icone.png' }} // Substitua pelo link do ícone da bicicleta
+            source={{ uri: 'https://link-do-icone-bicicleta.com/icone.png' }} // Substitua pelo link correto do ícone da bicicleta
             style={styles.navIcon}
           />
         </TouchableOpacity>
         <TouchableOpacity>
           <Image
-            source={{ uri: 'https://link-do-icone-ferramenta.com/icone.png' }} // Substitua pelo link do ícone da ferramenta
+            source={{ uri: 'https://link-do-icone-ferramenta.com/icone.png' }} // Substitua pelo link correto do ícone da ferramenta
             style={styles.navIcon}
           />
         </TouchableOpacity>
@@ -70,6 +76,7 @@ const HomeScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  // Estilos usados na tela
   container: {
     flex: 1,
     backgroundColor: '#FFB400', // Cor de fundo laranja
@@ -102,13 +109,11 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 30,
     fontWeight: 'bold',
-    marginTop: -190,
     color: '#000',
   },
   userName: {
     fontSize: 30,
     fontWeight: 'bold',
-    marginTop: -30,
     color: '#000',
   },
   button: {
@@ -149,4 +154,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default Principal;

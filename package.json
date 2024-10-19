@@ -1,16 +1,17 @@
 {
-  "name": "app-bikesync-oficial",
+  "name": "bikesync",
   "version": "1.0.0",
   "main": "expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
+    "start": "node --max-old-space-size=8192 node_modules/.bin/expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web"
   },
   "dependencies": {
     "@expo/metro-runtime": "~3.2.3",
-    "@react-native-async-storage/async-storage": "1.23.1",
+    "@react-native-async-storage/async-storage": "^1.23.1",
+    "@react-native-community/masked-view": "^0.1.11",
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/stack": "^6.4.1",
     "expo": "^51.0.38",
@@ -23,7 +24,8 @@
     "react-native-elements": "^3.4.3",
     "react-native-gesture-handler": "~2.16.1",
     "react-native-reanimated": "~3.10.1",
-    "react-native-screens": "3.31.1",
+    "react-native-safe-area-context": "^4.11.1",
+    "react-native-screens": "^3.34.0",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.19.10"
   },

@@ -1,4 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
+<<<<<<< Updated upstream
 import { StyleSheet, View, TouchableOpacity, Image } from 'react-native';
 import { Button, Input, Text } from 'react-native-elements';
 import { Icon } from 'react-native-elements/dist/icons/Icon';
@@ -15,27 +16,90 @@ export default function Login({navigation}) {
 
   const [showPassword, setShowPassword] = useState(false);
 
+=======
+import { StyleSheet, View, TouchableOpacity, Image, Alert, Text } from 'react-native';
+import { Button, Input } from 'react-native-elements';
+import { Icon } from 'react-native-elements/dist/icons/Icon';
+import { useState } from 'react';
+
+export default function Login({ navigation, route }) {
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(''); // Novo estado para a mensagem de erro
+
+  // Pega o tipo de login da rota
+  const { tipoLogin } = route.params;
+
+  const entrar = () => {
+    setErrorMessage(''); // Limpa a mensagem de erro ao tentar fazer login
+  
+    if (email === '' || senha === '') {
+      setErrorMessage('Por favor, preencha todos os campos.'); // Atualiza a mensagem de erro
+      return;
+    }
+  
+    console.log("Dados do login:", { email, senha, tipoLogin });
+  
+    // Faz a requisição para o back-end
+    fetch('http://localhost:3000/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, senha, tipoLogin }),
+    })
+      .then(response => {
+        if (!response.ok) {
+          return response.json().then(data => {
+            // Atualiza a mensagem de erro
+            setErrorMessage('Email ou senha inválidos.'); // Mensagem genérica para erro de login
+            throw new Error('Email ou senha inválidos.'); // Lança um erro com a mensagem genérica
+          });
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          Alert.alert('Sucesso', 'Login bem-sucedido!');
+          // Redireciona para a tela principal com os dados do usuário
+          navigation.reset({ 
+            index: 0, 
+            routes: [{ name: 'PrincipalUsuario', params: { nome: data.user.nome } }] 
+          });
+        }
+      })
+      .catch(error => {
+        console.error("Error:", error); // Log do erro no console
+        setErrorMessage('Email ou senha inválidos.'); // Mensagem de erro genérica ao capturar o erro
+      });
+  };
+  
+>>>>>>> Stashed changes
   return (
     <View style={styles.container}>
-      {/* Adicionando a imagem */}
-      <Image
-        source={require('../assets/bikesyncimagem.png')}
-        style={styles.logo}
-      />
+      <Image source={require('../assets/bikesyncimagem.png')} style={styles.logo} />
 
       <Text style={styles.title}>BikeSync</Text>
-      <Text style={styles.subtitle}>
-        Conectando você ao cuidado ideal para sua bicicleta!
-      </Text>
+      <Text style={styles.subtitle}>Conectando você ao cuidado ideal para sua bicicleta!</Text>
 
       <View style={styles.loginBox}>
         <Text h4 style={styles.loginTitle}>Faça login na sua conta</Text>
+
+        {errorMessage ? (
+          <Text style={styles.errorMessage}>{errorMessage}</Text> // Exibe a mensagem de erro
+        ) : null}
 
         <Input
           placeholder="E-mail"
           leftIcon={{ type: 'font-awesome', name: 'user' }}
           containerStyle={styles.input}
           keyboardType="email-address"
+<<<<<<< Updated upstream
+=======
+          value={email}
+          onChangeText={setEmail}
+>>>>>>> Stashed changes
         />
 
         <Input
@@ -43,14 +107,14 @@ export default function Login({navigation}) {
           leftIcon={{ type: 'font-awesome', name: 'lock' }}
           containerStyle={styles.input}
           secureTextEntry={!showPassword}
+<<<<<<< Updated upstream
+=======
+          value={senha}
+          onChangeText={setSenha}
+>>>>>>> Stashed changes
           rightIcon={
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-              <Icon
-                type="font-awesome"
-                name={showPassword ? 'eye-slash' : 'eye'}
-                size={20}
-                color="gray"
-              />
+              <Icon type="font-awesome" name={showPassword ? 'eye-slash' : 'eye'} size={20} color="gray" />
             </TouchableOpacity>
           }
         />
@@ -64,14 +128,8 @@ export default function Login({navigation}) {
         <Button
           title="ENTRAR"
           buttonStyle={styles.loginButton}
-          icon={
-            <Icon
-              name="arrow-right"
-              size={20}
-              color="white"
-            />
-          }
-          onPress={entrar}  
+          icon={<Icon name="arrow-right" size={20} color="white" />}
+          onPress={entrar}
         />
       </View>
     </View>
@@ -86,9 +144,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   logo: {
-    width: 100, 
+    width: 100,
     height: 100,
-    marginBottom: 20, 
+    marginBottom: 20,
   },
   title: {
 
@@ -96,7 +154,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000000',
     textAlign: 'left',
-    marginTop: -20
+    marginTop: -20,
   },
   subtitle: {
     fontSize: 16,
@@ -125,6 +183,11 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 10,
+  },
+  errorMessage: {
+    color: 'red', // Estilo para a mensagem de erro
+    marginBottom: 10,
+    textAlign: 'center',
   },
   loginButton: {
     backgroundColor: '#ff7900',

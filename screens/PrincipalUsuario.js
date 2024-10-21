@@ -1,88 +1,58 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
-const Principal = ({ navigation, route }) => {
-  // Captura o nome do usuário dos parâmetros de navegação
+const PrincipalUsuario = ({ navigation, route }) => {
   const { nome } = route.params;
 
   return (
     <View style={styles.container}>
-      {/* Cabeçalho com logotipo e ícones */}
       <View style={styles.header}>
         <Image
-          source={require('../assets/bikesyncimagem.png')} // Substitua pelo caminho correto do logotipo
+          source={require('../assets/bikesyncimagem.png')}
           style={styles.logo}
         />
         <View style={styles.icons}>
           <Image
-            source={{ uri: '../assets/usuario.png' }} // Substitua pelo link correto do ícone de usuário
+            source={{ uri: '../assets/usuario.png' }}
             style={styles.icon}
           />
           <Image
-            source={{ uri: 'https://link-do-icone-perfil.com/icone.png' }} // Substitua pelo link correto do ícone de perfil
+            source={{ uri: 'https://link-do-icone-perfil.com/icone.png' }}
             style={styles.icon}
           />
         </View>
       </View>
 
-      {/* Saudação e nome do usuário */}
       <View style={styles.welcomeContainer}>
         <Text style={styles.welcomeText}>Bem-vindo!</Text>
-        <Text style={styles.userName}>{nome}</Text> {/* Exibe o nome do usuário */}
+        <Text style={styles.userName}>{nome}</Text>
       </View>
 
-      {/* Botão "Minhas Bicicletas" */}
+      {/* Botão para exibir Minhas Bicicletas */}
       <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate('MinhasBicicletas')} // Navega para MinhasBicicletasScreen
-      >
-        <Text style={styles.buttonText}>Minhas Bicicletas</Text>
-      </TouchableOpacity>
+      style={styles.button}
+      onPress={() => navigation.navigate('MinhasBicicletas', { id_usuario: 1 })} // Substitua 1 pelo ID do usuário atual
+>
+  <Text style={styles.buttonText}>VER MINHAS BICICLETAS</Text>
+</TouchableOpacity>
+
 
       {/* Botão "Adicionar Nova Bicicleta" */}
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() => navigation.navigate('AdicionarBicicleta')} // Navega para AdicionarBicicletaScreen
+        onPress={() => navigation.navigate('AdicionarBicicleta')}
       >
         <Text style={styles.addButtonText}>ADICIONAR NOVA BICICLETA +</Text>
       </TouchableOpacity>
-
-      {/* Barra de navegação com ícones */}
-      <View style={styles.navigationBar}>
-        <TouchableOpacity>
-          <Image
-            source={{ uri: 'https://link-do-icone-casa.com/icone.png' }} // Substitua pelo link correto do ícone da casa
-            style={styles.navIcon}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Image
-            source={{ uri: 'https://link-do-icone-loja.com/icone.png' }} // Substitua pelo link correto do ícone da loja
-            style={styles.navIcon}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Image
-            source={{ uri: 'https://link-do-icone-bicicleta.com/icone.png' }} // Substitua pelo link correto do ícone da bicicleta
-            style={styles.navIcon}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Image
-            source={{ uri: 'https://link-do-icone-ferramenta.com/icone.png' }} // Substitua pelo link correto do ícone da ferramenta
-            style={styles.navIcon}
-          />
-        </TouchableOpacity>
-      </View>
     </View>
   );
 };
 
+// Definição dos estilos
 const styles = StyleSheet.create({
-  // Estilos usados na tela
   container: {
     flex: 1,
-    backgroundColor: '#FFB400', // Cor de fundo laranja
+    backgroundColor: '#FFB400',
     padding: 20,
     justifyContent: 'space-between',
   },
@@ -145,16 +115,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  navigationBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: '#000',
-    paddingVertical: 10,
-  },
-  navIcon: {
-    width: 30,
-    height: 30,
-  },
 });
 
-export default Principal;
+export default PrincipalUsuario; // Certifique-se de que a exportação está correta

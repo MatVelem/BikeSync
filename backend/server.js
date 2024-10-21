@@ -1,15 +1,15 @@
-
 // Importa as dependências
 const express = require('express');
 const mysql = require('mysql2');
 const bodyParser = require('body-parser'); // Para interpretar o JSON
 const cors = require('cors'); // Importa o cors
+const bcrypt = require('bcrypt'); // Importa o bcrypt
 
 // Cria a instância do Express
 const app = express();
 
 // Middleware para permitir CORS
-app.use(cors()); // Agora está na posição correta
+app.use(cors());
 
 // Middleware para interpretar JSON
 app.use(bodyParser.json());
@@ -37,7 +37,6 @@ app.post('/bicicletas', (req, res) => {
   
   const sql = 'INSERT INTO Bicicleta (marca, modelo, ano, tamanho_roda, serial, tipo, cor, material, kit_transmissao, tamanho_quadro, informacoes_adicionais, id_usuario) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
   
-  // Usa 'connection' ao invés de 'db'
   connection.query(sql, [marca, modelo, ano, tamanho_roda, serial, tipo, cor, material, kit_transmissao, tamanho_quadro, informacoes_adicionais, id_usuario], (err, result) => {
     if (err) {
       return res.status(500).send(err);
@@ -46,10 +45,27 @@ app.post('/bicicletas', (req, res) => {
   });
 });
 
+// Rota para obter todas as bicicletas
+app.get('/api/bicletas', (req, res) => {
+  const sql = 'SELECT * FROM Bicicleta';
+  connection.query(sql, (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: err });
+    }
+    res.json(results);
+  });
+});
 
+// Rota para obter bicicletas de um usuário específico
+app.get('/api/bicletas/:id_usuario', (req, res) => {
+  const { id_usuario } = req.params; // Pega o id_usuario da URL
 
-// Importa o bcrypt
-const bcrypt = require('bcrypt');
+  const sql = 'SELECT id_bicicleta, marca, modelo, ano, tamanho_roda, serial, tipo, cor, material, kit_transmissao, tamanho_quadro, informacoes_adicionais FROM Bicicleta WHERE id_usuario = ?'; // Consulta para filtrar bicicletas pelo id_usuario
+  connection.query(sql, [id_usuario], (err, results) => {
+    if (err) return res.status(500).json({ error: err });
+    res.json(results); // Retorna as bicicletas encontradas
+  });
+});
 
 // Rota para login
 app.post('/login', (req, res) => {
@@ -91,6 +107,7 @@ app.post('/login', (req, res) => {
             message: 'Login bem-sucedido!',
             user: {
               nome: user.nome, // Aqui está o nome do usuário
+              id_usuario: user.id_usuario // Adiciona o id do usuário para uso posterior
             },
           });
         } else {
@@ -102,13 +119,10 @@ app.post('/login', (req, res) => {
       res.status(404).send({ success: false, message: 'Usuário não encontrado.' });
     }
   });
-   
-  });
-
+});
 
 // Define a porta e inicia o servidor
 const port = 3000; // Verifique se esta é a porta que você deseja usar
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
 });
-

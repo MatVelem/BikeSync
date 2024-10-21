@@ -1,5 +1,9 @@
 {
+<<<<<<< Updated upstream
   "hostType": "26.44.49.106",
+=======
+  "hostType": "tunnel",
+>>>>>>> Stashed changes
   "lanType": "ip",
   "dev": true,
   "minify": false,

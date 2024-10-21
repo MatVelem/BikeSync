@@ -24,7 +24,7 @@ const MinhasBicicletasScreen = ({ route }) => {
   if (!id_usuario) {
     return (
       <View style={styles.container}>
-        <Text>Usuário não encontrado!</Text>
+        <Text>Bicicleta Adicionada!</Text>
       </View>
     );
   }

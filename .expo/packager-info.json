@@ -1,4 +1,5 @@
 {
+<<<<<<< Updated upstream
   "expoServerPort": null,
   "packagerPort": null,
   "expoServerNgrokUrl": null,
@@ -6,4 +7,12 @@
   "ngrokPid": null,
   "webpackServerPort": null,
   "packagerPid": null
+=======
+  "expoServerPort": 19000,
+  "packagerPort": 19000,
+  "expoServerNgrokUrl": "https://bmcplqi.anonymous.bikesync.exp.direct",
+  "packagerNgrokUrl": "https://bmcplqi.anonymous.bikesync.exp.direct",
+  "ngrokPid": 9664,
+  "webpackServerPort": null
+>>>>>>> Stashed changes
 }

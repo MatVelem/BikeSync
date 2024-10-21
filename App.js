@@ -5,6 +5,7 @@ import Entrada from './screens/Entrada';
 import Login from './screens/Login';
 import PrincipalUsuario from './screens/PrincipalUsuario';
 import MinhasBicicletasScreen from './screens/MinhasBicicletasScreen'; // Adicione isso
+import AdicionarBicicletaScreen from './screens/AdicionarBicicletaScreen';
 
 const Stack = createStackNavigator();
 
@@ -31,6 +32,11 @@ function MyStack() {
         component={MinhasBicicletasScreen} // Adicione isso
         options={{ title: 'Minhas Bicicletas' }}
       />
+      <Stack.Screen 
+        name="AdicionarBicicleta" 
+        component={AdicionarBicicletaScreen} // Adicione isso
+        options={{ title: 'Adicionar Bicicleta' }}
+        />
     </Stack.Navigator>
   );
 }

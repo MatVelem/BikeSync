@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
 const PrincipalUsuario = ({ navigation, route }) => {
-  const { nome } = route.params;
+  const { nome, id_usuario } = route.params; // Recebe o id_usuario junto com o nome
 
   return (
     <View style={styles.container}>
@@ -30,17 +30,16 @@ const PrincipalUsuario = ({ navigation, route }) => {
 
       {/* Botão para exibir Minhas Bicicletas */}
       <TouchableOpacity
-      style={styles.button}
-      onPress={() => navigation.navigate('MinhasBicicletas', { id_usuario: 1 })} // Substitua 1 pelo ID do usuário atual
->
-  <Text style={styles.buttonText}>VER MINHAS BICICLETAS</Text>
-</TouchableOpacity>
-
+        style={styles.button}
+        onPress={() => navigation.navigate('MinhasBicicletas', { id_usuario: 1})} // Passa o id_usuario para a tela de Minhas Bicicletas
+      >
+        <Text style={styles.buttonText}>VER MINHAS BICICLETAS</Text>
+      </TouchableOpacity>
 
       {/* Botão "Adicionar Nova Bicicleta" */}
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() => navigation.navigate('AdicionarBicicleta')}
+        onPress={() => navigation.navigate('AdicionarBicicleta', { id_usuario: 1})} // Passa o id_usuario para a tela de Adicionar Bicicleta
       >
         <Text style={styles.addButtonText}>ADICIONAR NOVA BICICLETA +</Text>
       </TouchableOpacity>
@@ -117,4 +116,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PrincipalUsuario; // Certifique-se de que a exportação está correta
+export default PrincipalUsuario;

@@ -3,27 +3,18 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import Entrada from './screens/Entrada';
 import Login from './screens/Login';
-<<<<<<< Updated upstream
-import Principal from './screens/Principal';
-=======
-import PrincipalUsuario from './screens/PrincipalUsuario';
-import MinhasBicicletasScreen from './screens/MinhasBicicletasScreen';
-import AdicionarBicicletaScreen from './screens/AdicionarBicicletaScreen';
-import DetalhesBicicleta from './screens/DetalhesBicicleta'; 
->>>>>>> Stashed changes
+import PrincipalUsuario from './screens/PrincipalUsuario';  // Verifique se o caminho está correto
 
 const Stack = createStackNavigator();
 
 function MyStack() {
   return (
     <Stack.Navigator>
-
       <Stack.Screen 
         name="Entrada" 
         component={Entrada} 
         options={{ title: 'Entrada' }}
       />
-
       <Stack.Screen 
         name="Login" 
         component={Login} 
@@ -31,7 +22,7 @@ function MyStack() {
       />
       <Stack.Screen 
         name="PrincipalUsuario" 
-        component={PrincipalUsuario} 
+        component={PrincipalUsuario}  // Aqui deve referenciar corretamente
         options={{ title: 'PrincipalUsuario' }}
       />
     </Stack.Navigator>
@@ -39,7 +30,7 @@ function MyStack() {
 }
 
 export default function App() {
-  return(
+  return (
     <NavigationContainer>
       <MyStack />
     </NavigationContainer>

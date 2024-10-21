@@ -1,22 +1,4 @@
 import { StatusBar } from 'expo-status-bar';
-<<<<<<< Updated upstream
-import { StyleSheet, View, TouchableOpacity, Image } from 'react-native';
-import { Button, Input, Text } from 'react-native-elements';
-import { Icon } from 'react-native-elements/dist/icons/Icon';
-import { useState } from 'react';
-
-export default function Login({navigation}) {
-
-  const entrar = () => {
-    navigation.reset({
-      index: 0,
-      routes: [{name: "Principal"}]
-    });
-  };
-
-  const [showPassword, setShowPassword] = useState(false);
-
-=======
 import { StyleSheet, View, TouchableOpacity, Image, Alert, Text } from 'react-native';
 import { Button, Input } from 'react-native-elements';
 import { Icon } from 'react-native-elements/dist/icons/Icon';
@@ -75,7 +57,6 @@ export default function Login({ navigation, route }) {
       });
   };
   
->>>>>>> Stashed changes
   return (
     <View style={styles.container}>
       <Image source={require('../assets/bikesyncimagem.png')} style={styles.logo} />
@@ -95,11 +76,8 @@ export default function Login({ navigation, route }) {
           leftIcon={{ type: 'font-awesome', name: 'user' }}
           containerStyle={styles.input}
           keyboardType="email-address"
-<<<<<<< Updated upstream
-=======
           value={email}
           onChangeText={setEmail}
->>>>>>> Stashed changes
         />
 
         <Input
@@ -107,11 +85,8 @@ export default function Login({ navigation, route }) {
           leftIcon={{ type: 'font-awesome', name: 'lock' }}
           containerStyle={styles.input}
           secureTextEntry={!showPassword}
-<<<<<<< Updated upstream
-=======
           value={senha}
           onChangeText={setSenha}
->>>>>>> Stashed changes
           rightIcon={
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
               <Icon type="font-awesome" name={showPassword ? 'eye-slash' : 'eye'} size={20} color="gray" />

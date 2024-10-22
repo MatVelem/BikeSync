@@ -2,7 +2,7 @@
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
 
-// Conexão com o banco de dados MySQL
+
 const connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',

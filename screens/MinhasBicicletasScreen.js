@@ -9,7 +9,7 @@ const MinhasBicicletasScreen = ({ route }) => {
     const fetchBicicletas = async () => {
       if (id_usuario) {
         try {
-          const response = await fetch(`http://localhost:3000/api/bicletas/${id_usuario}`);
+          const response = await fetch(`http://localhost:3000/api/bicicletas/${id_usuario}`);
           const data = await response.json();
           setBicicletas(data);
         } catch (error) {

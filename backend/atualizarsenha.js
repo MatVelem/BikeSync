@@ -1,8 +1,8 @@
-// updatePassword.js
+
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
 
-// Conexão com o banco de dados MySQL
+
 const connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
@@ -10,7 +10,7 @@ const connection = mysql.createConnection({
   database: 'BikeSync',
 });
 
-// Função para atualizar a senha
+
 const updatePassword = async () => {
   const senhaAntiga = 'senha123'; // Senha original que foi armazenada
   const hash = await bcrypt.hash(senhaAntiga, 10); // Hash a senha com um custo de 10
@@ -23,10 +23,10 @@ const updatePassword = async () => {
       console.log('Senha atualizada com sucesso!');
     }
 
-    // Feche a conexão após a operação
+    
     connection.end();
   });
 };
 
-// Chame a função para executar a atualização
+
 updatePassword();

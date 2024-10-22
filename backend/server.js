@@ -46,7 +46,7 @@ app.post('/bicicletas', (req, res) => {
 });
 
 // Rota para obter todas as bicicletas
-app.get('/api/bicletas', (req, res) => {
+app.get('/api/bicicletas', (req, res) => {
   const sql = 'SELECT * FROM Bicicleta';
   connection.query(sql, (err, results) => {
     if (err) {
@@ -57,7 +57,7 @@ app.get('/api/bicletas', (req, res) => {
 });
 
 // Rota para obter bicicletas de um usuário específico
-app.get('/api/bicletas/:id_usuario', (req, res) => {
+app.get('/api/bicicletas/:id_usuario', (req, res) => {
   const { id_usuario } = req.params; // Pega o id_usuario da URL
 
   const sql = 'SELECT id_bicicleta, marca, modelo, ano, tamanho_roda, serial, tipo, cor, material, kit_transmissao, tamanho_quadro, informacoes_adicionais FROM Bicicleta WHERE id_usuario = ?'; // Consulta para filtrar bicicletas pelo id_usuario

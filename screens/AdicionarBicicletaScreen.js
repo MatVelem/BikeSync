@@ -27,7 +27,7 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
       kit_transmissao: kitTransmissao,
       tamanho_quadro: tamanhoQuadro,
       informacoes_adicionais: informacoesAdicionais,
-      id_usuario: 1, // Adicionar o ID do usuário logado
+      id_usuario: 1,
     };
 
     try {
@@ -42,7 +42,7 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
       if (response.ok) {
         Alert.alert('Sucesso', 'Bicicleta adicionada com sucesso!');
         navigation.navigate('MinhasBicicletas');
-      } else {
+      }if (!response.ok) {
         Alert.alert('Erro', 'Não foi possível adicionar a bicicleta.');
       }
     } catch (error) {
@@ -62,34 +62,86 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
 
           {/* Formulário abaixo do botão */}
           <Text>Marca:</Text>
-          <TextInput style={styles.input} value={marca} onChangeText={setMarca} />
+          <TextInput
+            style={styles.input}
+            value={marca}
+            onChangeText={setMarca}
+            placeholder="Marca:"
+          />
 
           <Text>Modelo:</Text>
-          <TextInput style={styles.input} value={modelo} onChangeText={setModelo} />
+          <TextInput
+            style={styles.input}
+            value={modelo}
+            onChangeText={setModelo}
+            placeholder="Modelo:"
+          />
 
           <Text>Ano:</Text>
-          <TextInput style={styles.input} value={ano} onChangeText={setAno} keyboardType="numeric" />
+          <TextInput
+            style={styles.input}
+            value={ano}
+            onChangeText={setAno}
+            keyboardType="numeric"
+            placeholder="Ano:"
+          />
 
           <Text>Tamanho da Roda:</Text>
-          <TextInput style={styles.input} value={tamanhoRoda} onChangeText={setTamanhoRoda} keyboardType="numeric" />
+          <TextInput
+            style={styles.input}
+            value={tamanhoRoda}
+            onChangeText={setTamanhoRoda}
+            keyboardType="numeric"
+            placeholder="Tamanho da Roda:"
+          />
 
           <Text>Serial:</Text>
-          <TextInput style={styles.input} value={serial} onChangeText={setSerial} />
+          <TextInput
+            style={styles.input}
+            value={serial}
+            onChangeText={setSerial}
+            placeholder="Serial:"
+          />
 
           <Text>Tipo:</Text>
-          <TextInput style={styles.input} value={tipo} onChangeText={setTipo} />
+          <TextInput
+            style={styles.input}
+            value={tipo}
+            onChangeText={setTipo}
+            placeholder="Tipo:"
+          />
 
           <Text>Cor:</Text>
-          <TextInput style={styles.input} value={cor} onChangeText={setCor} />
+          <TextInput
+            style={styles.input}
+            value={cor}
+            onChangeText={setCor}
+            placeholder="Cor:"
+          />
 
           <Text>Material:</Text>
-          <TextInput style={styles.input} value={material} onChangeText={setMaterial} />
+          <TextInput
+            style={styles.input}
+            value={material}
+            onChangeText={setMaterial}
+            placeholder="Material:"
+          />
 
           <Text>Kit de Transmissão:</Text>
-          <TextInput style={styles.input} value={kitTransmissao} onChangeText={setKitTransmissao} />
+          <TextInput
+            style={styles.input}
+            value={kitTransmissao}
+            onChangeText={setKitTransmissao}
+            placeholder="Kit de Transmissão:"
+          />
 
           <Text>Tamanho do Quadro:</Text>
-          <TextInput style={styles.input} value={tamanhoQuadro} onChangeText={setTamanhoQuadro} />
+          <TextInput
+            style={styles.input}
+            value={tamanhoQuadro}
+            onChangeText={setTamanhoQuadro}
+            placeholder="Tamanho do Quadro:"
+          />
 
           <Text>Informações Adicionais:</Text>
           <TextInput
@@ -97,6 +149,7 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
             value={informacoesAdicionais}
             onChangeText={setInformacoesAdicionais}
             multiline
+            placeholder="Informações Adicionais:"
           />
         </View>
       </ScrollView>

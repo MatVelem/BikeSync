@@ -158,20 +158,92 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    paddingBottom: 20,
-  },
   container: {
+    flex: 1,
     padding: 20,
+    backgroundColor: '#FFD700',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
+    color: '#333',
+  },
+  inputRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
+    flex: 1,
     borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 8,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    backgroundColor: '#fff',
+    marginBottom: 10,
+  },
+  picker: {
+    flex: 1,
+    height: 50,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    marginHorizontal: 5,
+  },
+  pickerSingle: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    height: 50,
+    backgroundColor: '#fff',
+    marginBottom: 10,
+  },
+  label: {
+    flex: 1,
+    fontSize: 16,
+    color: '#333',
+  },
+  colorPicker: {
+    flex: 1,
+    backgroundColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    marginHorizontal: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  colorSample: {
+    fontSize: 16,
+    color: '#000',
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: '#000',
+    borderRadius: 5,
+    padding: 10,
+    marginRight: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  saveButton: {
+    flex: 1,
+    backgroundColor: '#FFA500',
+    borderRadius: 5,
+    padding: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonText: {
+    fontSize: 18,
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 

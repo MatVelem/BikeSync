@@ -118,6 +118,21 @@ app.post('/login', (req, res) => {
   });
 });
 
+app.delete('/bicicletas/:id_bicicleta', (req, res) => {
+  const { id_bicicleta } = req.params;
+
+  const sql = 'DELETE FROM Bicicleta WHERE id_bicicleta = ?';
+  connection.query(sql, [id_bicicleta], (err, result) => {
+    if (err) {
+      return res.status(500).send({ message: 'Erro ao deletar bicicleta', error: err });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).send({ message: 'Bicicleta não encontrada' });
+    }
+    res.status(200).send({ message: 'Bicicleta deletada com sucesso!' });
+  });
+});
+
 const port = 3000; 
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);

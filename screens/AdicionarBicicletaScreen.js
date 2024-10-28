@@ -14,7 +14,28 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
   const [tamanhoQuadro, setTamanhoQuadro] = useState('');
   const [informacoesAdicionais, setInformacoesAdicionais] = useState('');
 
+  const validarFormulario = () => {
+    if (!marca || !modelo || !ano || !tamanhoRoda || !serial) {
+      Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
+      return false;
+    }
+
+    if (isNaN(ano) || isNaN(tamanhoRoda)) {
+      Alert.alert('Erro', 'Ano e Tamanho da Roda devem ser numéricos.');
+      return false;
+    }
+
+    if (serial.length < 5) {
+      Alert.alert('Erro', 'O Serial deve ter pelo menos 5 caracteres.');
+      return false;
+    }
+
+    return true;
+  };
+
   const handleAdicionarBicicleta = async () => {
+    if (!validarFormulario()) return;
+
     const bicicleta = {
       marca,
       modelo,
@@ -42,11 +63,12 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
       if (response.ok) {
         Alert.alert('Sucesso', 'Bicicleta adicionada com sucesso!');
         navigation.navigate('MinhasBicicletas');
-      }if (!response.ok) {
+      } else {
         Alert.alert('Erro', 'Não foi possível adicionar a bicicleta.');
       }
     } catch (error) {
       console.error('Erro ao adicionar bicicleta:', error);
+      Alert.alert('Erro', 'Ocorreu um erro ao tentar adicionar a bicicleta.');
     }
   };
 
@@ -57,50 +79,48 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
-          {/* Botão para enviar o formulário */}
           <Button title="Adicionar Bicicleta" onPress={handleAdicionarBicicleta} />
 
-          {/* Formulário abaixo do botão */}
-          <Text>Marca:</Text>
+          <Text>Marca*:</Text>
           <TextInput
             style={styles.input}
             value={marca}
             onChangeText={setMarca}
-            placeholder="Marca:"
+            placeholder="Marca"
           />
 
-          <Text>Modelo:</Text>
+          <Text>Modelo*:</Text>
           <TextInput
             style={styles.input}
             value={modelo}
             onChangeText={setModelo}
-            placeholder="Modelo:"
+            placeholder="Modelo"
           />
 
-          <Text>Ano:</Text>
+          <Text>Ano*:</Text>
           <TextInput
             style={styles.input}
             value={ano}
             onChangeText={setAno}
             keyboardType="numeric"
-            placeholder="Ano:"
+            placeholder="Ano"
           />
 
-          <Text>Tamanho da Roda:</Text>
+          <Text>Tamanho da Roda*:</Text>
           <TextInput
             style={styles.input}
             value={tamanhoRoda}
             onChangeText={setTamanhoRoda}
             keyboardType="numeric"
-            placeholder="Tamanho da Roda:"
+            placeholder="Tamanho da Roda"
           />
 
-          <Text>Serial:</Text>
+          <Text>Serial*:</Text>
           <TextInput
             style={styles.input}
             value={serial}
             onChangeText={setSerial}
-            placeholder="Serial:"
+            placeholder="Serial"
           />
 
           <Text>Tipo:</Text>
@@ -108,7 +128,7 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
             style={styles.input}
             value={tipo}
             onChangeText={setTipo}
-            placeholder="Tipo:"
+            placeholder="Tipo"
           />
 
           <Text>Cor:</Text>
@@ -116,7 +136,7 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
             style={styles.input}
             value={cor}
             onChangeText={setCor}
-            placeholder="Cor:"
+            placeholder="Cor"
           />
 
           <Text>Material:</Text>
@@ -124,7 +144,7 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
             style={styles.input}
             value={material}
             onChangeText={setMaterial}
-            placeholder="Material:"
+            placeholder="Material"
           />
 
           <Text>Kit de Transmissão:</Text>
@@ -132,7 +152,7 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
             style={styles.input}
             value={kitTransmissao}
             onChangeText={setKitTransmissao}
-            placeholder="Kit de Transmissão:"
+            placeholder="Kit de Transmissão"
           />
 
           <Text>Tamanho do Quadro:</Text>
@@ -140,7 +160,7 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
             style={styles.input}
             value={tamanhoQuadro}
             onChangeText={setTamanhoQuadro}
-            placeholder="Tamanho do Quadro:"
+            placeholder="Tamanho do Quadro"
           />
 
           <Text>Informações Adicionais:</Text>
@@ -149,7 +169,7 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
             value={informacoesAdicionais}
             onChangeText={setInformacoesAdicionais}
             multiline
-            placeholder="Informações Adicionais:"
+            placeholder="Informações Adicionais"
           />
         </View>
       </ScrollView>
@@ -163,87 +183,13 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#FFD700',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-    color: '#333',
-  },
-  inputRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
   input: {
-    flex: 1,
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 5,
     padding: 10,
     backgroundColor: '#fff',
     marginBottom: 10,
-  },
-  picker: {
-    flex: 1,
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    marginHorizontal: 5,
-  },
-  pickerSingle: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    height: 50,
-    backgroundColor: '#fff',
-    marginBottom: 10,
-  },
-  label: {
-    flex: 1,
-    fontSize: 16,
-    color: '#333',
-  },
-  colorPicker: {
-    flex: 1,
-    backgroundColor: '#ccc',
-    borderRadius: 5,
-    padding: 10,
-    marginHorizontal: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  colorSample: {
-    fontSize: 16,
-    color: '#000',
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 20,
-  },
-  cancelButton: {
-    flex: 1,
-    backgroundColor: '#000',
-    borderRadius: 5,
-    padding: 10,
-    marginRight: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  saveButton: {
-    flex: 1,
-    backgroundColor: '#FFA500',
-    borderRadius: 5,
-    padding: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  buttonText: {
-    fontSize: 18,
-    color: '#fff',
-    fontWeight: 'bold',
   },
 });
 

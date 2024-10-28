@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, Button, Alert, StyleSheet } from 'react-native';
 
 const MinhasBicicletasScreen = ({ route }) => {
-  const { id_usuario } = route.params || {}; // Protege contra erro caso params seja undefined
+  const { id_usuario } = route.params || {}; 
   const [bicicletas, setBicicletas] = useState([]);
 
   useEffect(() => {
@@ -21,7 +21,6 @@ const MinhasBicicletasScreen = ({ route }) => {
     fetchBicicletas();
   }, [id_usuario]);
 
-  // Função para excluir a bicicleta
   const handleDelete = async (id_bicicleta) => {
     try {
       const response = await fetch(`http://localhost:3000/bicicletas/${id_bicicleta}`, {
@@ -29,7 +28,6 @@ const MinhasBicicletasScreen = ({ route }) => {
       });
 
       if (response.ok) {
-        // Remove a bicicleta excluída da lista atualizada
         setBicicletas((prevBicicletas) =>
           prevBicicletas.filter((bicicleta) => bicicleta.id_bicicleta !== id_bicicleta)
         );
@@ -59,7 +57,7 @@ const MinhasBicicletasScreen = ({ route }) => {
         keyExtractor={(item) => item.id_bicicleta.toString()}
         renderItem={({ item }) => (
           <View style={styles.bicicletaContainer}>
-            <Text>Marca: {item.marca}</Text>
+            <Text>Marca: {item.marca}</Text> {/* Exibe o nome da marca */}
             <Text>Modelo: {item.modelo}</Text>
             <Text>Ano: {item.ano}</Text>
             <Text>Cor: {item.cor}</Text>
@@ -83,7 +81,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#FFB400', // Cor de fundo parecida com a imagem
+    backgroundColor: '#FFB400',
   },
   title: {
     fontSize: 24,

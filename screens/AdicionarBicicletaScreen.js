@@ -1,8 +1,20 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  Alert,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  Picker
+} from 'react-native';
 
 const AdicionarBicicletaScreen = ({ navigation }) => {
-  const [marca, setMarca] = useState('');
+  const [marcas, setMarcas] = useState([]);
+  const [marcaSelecionada, setMarcaSelecionada] = useState('');
   const [modelo, setModelo] = useState('');
   const [ano, setAno] = useState('');
   const [tamanhoRoda, setTamanhoRoda] = useState('');
@@ -14,8 +26,26 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
   const [tamanhoQuadro, setTamanhoQuadro] = useState('');
   const [informacoesAdicionais, setInformacoesAdicionais] = useState('');
 
+  useEffect(() => {
+    const fetchMarcas = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/marcas');
+        if (!response.ok) {
+          throw new Error('Erro ao buscar marcas');
+        }
+        const data = await response.json();
+        setMarcas(data);
+      } catch (error) {
+        console.error('Erro ao buscar marcas:', error);
+        Alert.alert('Erro', 'Não foi possível carregar as marcas.');
+      }
+    };
+
+    fetchMarcas();
+  }, []);
+
   const validarFormulario = () => {
-    if (!marca || !modelo || !ano || !tamanhoRoda || !serial) {
+    if (!marcaSelecionada || !modelo || !ano || !tamanhoRoda || !serial) {
       Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
       return false;
     }
@@ -37,7 +67,7 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
     if (!validarFormulario()) return;
 
     const bicicleta = {
-      marca,
+      id_marca: marcaSelecionada,
       modelo,
       ano: parseInt(ano),
       tamanho_roda: parseInt(tamanhoRoda),
@@ -64,7 +94,8 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
         Alert.alert('Sucesso', 'Bicicleta adicionada com sucesso!');
         navigation.navigate('MinhasBicicletas');
       } else {
-        Alert.alert('Erro', 'Não foi possível adicionar a bicicleta.');
+        const errorResponse = await response.json(); // Obter a resposta de erro
+        Alert.alert('Erro', errorResponse.message || 'Não foi possível adicionar a bicicleta.');
       }
     } catch (error) {
       console.error('Erro ao adicionar bicicleta:', error);
@@ -82,12 +113,16 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
           <Button title="Adicionar Bicicleta" onPress={handleAdicionarBicicleta} />
 
           <Text>Marca*:</Text>
-          <TextInput
+          <Picker
+            selectedValue={marcaSelecionada}
             style={styles.input}
-            value={marca}
-            onChangeText={setMarca}
-            placeholder="Marca"
-          />
+            onValueChange={(itemValue) => setMarcaSelecionada(itemValue)}
+          >
+            <Picker.Item label="Selecione uma marca" value="" />
+            {marcas.map((marca) => (
+              <Picker.Item key={marca.id_marca} label={marca.nome_marca} value={marca.id_marca} />
+            ))}
+          </Picker>
 
           <Text>Modelo*:</Text>
           <TextInput

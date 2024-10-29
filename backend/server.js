@@ -1,4 +1,3 @@
-
 const express = require('express');
 const mysql = require('mysql2');
 const bodyParser = require('body-parser'); 
@@ -7,20 +6,16 @@ const bcrypt = require('bcrypt');
 
 const app = express();
 
-
 app.use(cors());
-
-
 app.use(bodyParser.json());
 
-
+// Configuração de conexão com o banco de dados
 const connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: 'admin',
   database: 'BikeSync',
 });
-
 
 connection.connect((err) => {
   if (err) {
@@ -30,23 +25,24 @@ connection.connect((err) => {
   console.log('Conectado ao banco de dados MySQL!');
 });
 
-
+// Endpoint para adicionar bicicleta com id_marca
 app.post('/bicicletas', (req, res) => {
-  const { marca, modelo, ano, tamanho_roda, serial, tipo, cor, material, kit_transmissao, tamanho_quadro, informacoes_adicionais, id_usuario } = req.body;
-  
-  const sql = 'INSERT INTO Bicicleta (marca, modelo, ano, tamanho_roda, serial, tipo, cor, material, kit_transmissao, tamanho_quadro, informacoes_adicionais, id_usuario) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-  
-  connection.query(sql, [marca, modelo, ano, tamanho_roda, serial, tipo, cor, material, kit_transmissao, tamanho_quadro, informacoes_adicionais, id_usuario], (err, result) => {
+  const { id_marca, modelo, ano, tamanho_roda, serial, tipo, cor, material, kit_transmissao, tamanho_quadro, informacoes_adicionais, id_usuario } = req.body;
+
+  const sql = 'INSERT INTO Bicicleta (id_marca, modelo, ano, tamanho_roda, serial, tipo, cor, material, kit_transmissao, tamanho_quadro, informacoes_adicionais, id_usuario) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+
+  connection.query(sql, [id_marca, modelo, ano, tamanho_roda, serial, tipo, cor, material, kit_transmissao, tamanho_quadro, informacoes_adicionais, id_usuario], (err, result) => {
     if (err) {
-      return res.status(500).send(err);
+      console.error('Erro ao adicionar bicicleta:', err); // Log do erro
+      return res.status(500).send({ message: 'Erro ao adicionar bicicleta', error: err });
     }
     res.status(200).send({ message: 'Bicicleta adicionada com sucesso!', bicicletaId: result.insertId });
   });
 });
 
-// Rota para obter todas as bicicletas
-app.get('/api/bicicletas', (req, res) => {
-  const sql = 'SELECT * FROM Bicicleta';
+// Rota para obter todas as marcas
+app.get('/marcas', (req, res) => {
+  const sql = 'SELECT * FROM Marca'; 
   connection.query(sql, (err, results) => {
     if (err) {
       return res.status(500).json({ error: err });
@@ -55,13 +51,42 @@ app.get('/api/bicicletas', (req, res) => {
   });
 });
 
+app.get('/api/lojas', (req, res) => {
+  const sql = 'SELECT * FROM Lojista'; 
+  connection.query(sql, (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: err });
+    }
+    res.json(results);
+  });
+});
 
+// Rota para obter todas as bicicletas (com JOIN para exibir nome da marca)
+app.get('/api/bicicletas', (req, res) => {
+  const sql = `SELECT b.id_bicicleta, m.nome_marca AS marca, b.modelo, b.ano, b.tamanho_roda, b.serial, b.tipo, b.cor, b.material, b.kit_transmissao, b.tamanho_quadro, b.informacoes_adicionais, b.id_usuario 
+               FROM Bicicleta b 
+               JOIN Marca m ON b.id_marca = m.id_marca`;
+
+  connection.query(sql, (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: err });
+    }
+    res.json(results);
+  });
+});
+
+// Rota para obter bicicletas de um usuário específico
 app.get('/api/bicicletas/:id_usuario', (req, res) => {
-  const { id_usuario } = req.params; 
-  const sql = 'SELECT id_bicicleta, marca, modelo, ano, tamanho_roda, serial, tipo, cor, material, kit_transmissao, tamanho_quadro, informacoes_adicionais FROM Bicicleta WHERE id_usuario = ?'; // Consulta para filtrar bicicletas pelo id_usuario
+  const { id_usuario } = req.params;
+
+  const sql = `SELECT b.id_bicicleta, m.nome_marca AS marca, b.modelo, b.ano, b.tamanho_roda, b.serial, b.tipo, b.cor, b.material, b.kit_transmissao, b.tamanho_quadro, b.informacoes_adicionais 
+               FROM Bicicleta b 
+               JOIN Marca m ON b.id_marca = m.id_marca 
+               WHERE b.id_usuario = ?`;
+
   connection.query(sql, [id_usuario], (err, results) => {
     if (err) return res.status(500).json({ error: err });
-    res.json(results); 
+    res.json(results);
   });
 });
 
@@ -91,14 +116,12 @@ app.post('/login', (req, res) => {
     if (result.length > 0) {
       const user = result[0];
 
-      
       bcrypt.compare(senha, user.senha, (err, match) => {
         if (err) {
           return res.status(500).send({ success: false, message: 'Erro ao verificar a senha.' });
         }
 
         if (match) {
-          
           res.status(200).send({
             success: true,
             message: 'Login bem-sucedido!',
@@ -108,7 +131,6 @@ app.post('/login', (req, res) => {
             },
           });
         } else {
-          // Se a senha não coincidir, retorna erro de senha incorreta
           res.status(401).send({ success: false, message: 'Senha incorreta.' });
         }
       });
@@ -118,6 +140,7 @@ app.post('/login', (req, res) => {
   });
 });
 
+// Rota para deletar uma bicicleta
 app.delete('/bicicletas/:id_bicicleta', (req, res) => {
   const { id_bicicleta } = req.params;
 

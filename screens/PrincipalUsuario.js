@@ -43,6 +43,14 @@ const PrincipalUsuario = ({ navigation, route }) => {
       >
         <Text style={styles.addButtonText}>ADICIONAR NOVA BICICLETA +</Text>
       </TouchableOpacity>
+
+      {/* Botão para exibir Lojas */}
+      <TouchableOpacity
+        style={styles.lojasButton}
+        onPress={() => navigation.navigate('Lojas')} // Navega para a tela de Lojas
+      >
+        <Text style={styles.lojasButtonText}>VER LOJAS</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -110,6 +118,19 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   addButtonText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  lojasButton: {
+    backgroundColor: '#007BFF', // Cor do botão para Lojas
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  lojasButtonText: {
     color: '#FFF',
     fontSize: 18,
     fontWeight: 'bold',

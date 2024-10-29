@@ -1,17 +1,38 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from 'react-native';
-import { fetchAgendamentos, fetchRelatorios } from '../api'; // Supondo que você tenha funções para buscar dados
 
 const Lojista = ({ navigation, route }) => {
   const [agendamentos, setAgendamentos] = useState([]);
   const [relatorios, setRelatorios] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Função para buscar agendamentos
+  const fetchAgendamentos = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/agendamentos'); // Certifique-se de que esta URL está correta
+      return await response.json();
+    } catch (error) {
+      console.error('Erro ao buscar agendamentos:', error);
+      return [];
+    }
+  };
+
+  // Função para buscar relatórios
+  const fetchRelatorios = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/relatorios'); // Certifique-se de que esta URL está correta
+      return await response.json();
+    } catch (error) {
+      console.error('Erro ao buscar relatórios:', error);
+      return [];
+    }
+  };
+
   useEffect(() => {
     const loadData = async () => {
       try {
-        const agendamentosData = await fetchAgendamentos(); // Função para buscar agendamentos
-        const relatoriosData = await fetchRelatorios(); // Função para buscar relatórios
+        const agendamentosData = await fetchAgendamentos();
+        const relatoriosData = await fetchRelatorios();
         setAgendamentos(agendamentosData);
         setRelatorios(relatoriosData);
       } catch (error) {
@@ -46,30 +67,18 @@ const Lojista = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      {/* Cabeçalho com logotipo e ícones */}
       <View style={styles.header}>
-        <Image
-          source={require('../assets/bikesyncimagem.png')} // Caminho da imagem do logotipo
-          style={styles.logo}
-        />
+        <Image source={require('../assets/bikesyncimagem.png')} style={styles.logo} />
         <View style={styles.icons}>
-          <Image
-            source={{ uri: '../assets/usuario.png' }}
-            style={styles.icon}
-          />
-          <Image
-            source={{ uri: 'https://link-do-icone-perfil.com/icone.png' }}
-            style={styles.icon}
-          />
+          <Image source={{ uri: '../assets/usuario.png' }} style={styles.icon} />
+          <Image source={{ uri: 'https://link-do-icone-perfil.com/icone.png' }} style={styles.icon} />
         </View>
       </View>
 
-      {/* Informações do Lojista */}
       <View style={styles.welcomeContainer}>
         <Text style={styles.welcomeText}>Painel do Lojista</Text>
       </View>
 
-      {/* Lista de Agendamentos */}
       <Text style={styles.subtitle}>Agendamentos</Text>
       <FlatList
         data={agendamentos}
@@ -78,7 +87,6 @@ const Lojista = ({ navigation, route }) => {
         style={styles.list}
       />
 
-      {/* Lista de Relatórios */}
       <Text style={styles.subtitle}>Relatórios</Text>
       <FlatList
         data={relatorios}
@@ -87,7 +95,6 @@ const Lojista = ({ navigation, route }) => {
         style={styles.list}
       />
 
-      {/* Botão de Ação para Relatórios */}
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate('Relatorio', { id_lojista: route.params.id_lojista })}
@@ -95,7 +102,6 @@ const Lojista = ({ navigation, route }) => {
         <Text style={styles.buttonText}>VER RELATÓRIOS DETALHADOS</Text>
       </TouchableOpacity>
 
-      {/* Botão de Ação para Agendamentos */}
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => navigation.navigate('Agendar', { id_lojista: route.params.id_lojista })}

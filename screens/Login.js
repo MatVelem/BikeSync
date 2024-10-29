@@ -8,21 +8,21 @@ export default function Login({ navigation, route }) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(''); // Novo estado para a mensagem de erro
+  const [errorMessage, setErrorMessage] = useState('');
 
   // Pega o tipo de login da rota
   const { tipoLogin } = route.params;
 
   const entrar = () => {
-    setErrorMessage(''); // Limpa a mensagem de erro ao tentar fazer login
-  
+    setErrorMessage('');
+
     if (email === '' || senha === '') {
-      setErrorMessage('Por favor, preencha todos os campos.'); // Atualiza a mensagem de erro
+      setErrorMessage('Por favor, preencha todos os campos.');
       return;
     }
-  
+
     console.log("Dados do login:", { email, senha, tipoLogin });
-  
+
     // Faz a requisição para o back-end
     fetch('http://localhost:3000/login', {
       method: 'POST',
@@ -34,9 +34,8 @@ export default function Login({ navigation, route }) {
       .then(response => {
         if (!response.ok) {
           return response.json().then(data => {
-            // Atualiza a mensagem de erro
-            setErrorMessage('Email ou senha inválidos.'); // Mensagem genérica para erro de login
-            throw new Error('Email ou senha inválidos.'); // Lança um erro com a mensagem genérica
+            setErrorMessage('Email ou senha inválidos.');
+            throw new Error('Email ou senha inválidos.');
           });
         }
         return response.json();
@@ -44,16 +43,24 @@ export default function Login({ navigation, route }) {
       .then(data => {
         if (data.success) {
           Alert.alert('Sucesso', 'Login bem-sucedido!');
-          // Redireciona para a tela principal com os dados do usuário
-          navigation.reset({ 
-            index: 0, 
-            routes: [{ name: 'PrincipalUsuario', params: { nome: data.user.nome } }] 
-          });
+
+          // Redireciona com base no tipo de login
+          if (tipoLogin === 'lojista') {
+            navigation.reset({ 
+              index: 0, 
+              routes: [{ name: 'PrincipalLojista', params: { nome: data.user.nome } }] 
+            });
+          } else {
+            navigation.reset({ 
+              index: 0, 
+              routes: [{ name: 'PrincipalUsuario', params: { nome: data.user.nome } }] 
+            });
+          }
         }
       })
       .catch(error => {
-        console.error("Error:", error); // Log do erro no console
-        setErrorMessage('Email ou senha inválidos.'); // Mensagem de erro genérica ao capturar o erro
+        console.error("Error:", error);
+        setErrorMessage('Email ou senha inválidos.');
       });
   };
   
@@ -68,7 +75,7 @@ export default function Login({ navigation, route }) {
         <Text h4 style={styles.loginTitle}>Faça login na sua conta</Text>
 
         {errorMessage ? (
-          <Text style={styles.errorMessage}>{errorMessage}</Text> // Exibe a mensagem de erro
+          <Text style={styles.errorMessage}>{errorMessage}</Text>
         ) : null}
 
         <Input
@@ -124,7 +131,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   title: {
-
     fontSize: 32,
     fontWeight: 'bold',
     color: '#000000',
@@ -160,7 +166,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   errorMessage: {
-    color: 'red', // Estilo para a mensagem de erro
+    color: 'red',
     marginBottom: 10,
     textAlign: 'center',
   },

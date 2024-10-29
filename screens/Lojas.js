@@ -10,7 +10,7 @@ const Lojas = () => {
   useEffect(() => {
     const fetchLojas = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/lojas'); // Altere para o seu endpoint correto
+        const response = await axios.get('http://localhost:3000/api/lojas'); 
         setLojas(response.data);
       } catch (err) {
         setError(err.message);

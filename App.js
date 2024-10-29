@@ -6,11 +6,8 @@ import Login from './screens/Login';
 import PrincipalUsuario from './screens/PrincipalUsuario';
 import MinhasBicicletasScreen from './screens/MinhasBicicletasScreen'; // Adicione isso
 import AdicionarBicicletaScreen from './screens/AdicionarBicicletaScreen';
-<<<<<<< HEAD
-import PrincipalLojista from './screens/PrincipalLojista';
-=======
+import PrincipalLojista from './screens/PrincipalLojista'; 
 import Lojas from './screens/Lojas';
->>>>>>> 62ff7e22d37dcf2cc843765c5f68e4b5888eb7e2
 
 const Stack = createStackNavigator();
 

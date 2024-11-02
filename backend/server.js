@@ -156,6 +156,40 @@ app.delete('/bicicletas/:id_bicicleta', (req, res) => {
   });
 });
 
+app.get('/historico', (req, res) => {
+  const { id_bicicleta } = req.query; // Parâmetro de consulta opcional
+
+  // Monta a consulta com base na presença do parâmetro id_bicicleta
+  let sql = `
+    SELECT 
+      h.id_historico, 
+      h.descricao, 
+      h.data_registro, 
+      h.id_bicicleta, 
+      h.id_servico,
+      s.tipo, 
+      s.preco
+    FROM Historico h
+    LEFT JOIN Servicos s ON h.id_servico = s.id_servico
+  `;
+
+  // Se um id_bicicleta for passado, aplica o filtro
+  if (id_bicicleta) {
+    sql += ` WHERE h.id_bicicleta = ?`;
+  }
+
+  connection.query(sql, [id_bicicleta].filter(Boolean), (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar histórico:', err);
+      return res.status(500).json({ error: 'Erro ao buscar histórico' });
+    }
+    console.log('Resultados da consulta:', results); // Verifique os dados retornados
+    res.json(results);
+  });
+});
+
+
+
 // Simulação dos dados (substitua pelo acesso ao banco de dados real)
 const agendamentos = [
   { id_agendamento: 1, nome_cliente: 'Carlos', data_agendamento: '2023-10-28', servico: 'Reparo' },

@@ -4,10 +4,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import Entrada from './screens/Entrada';
 import Login from './screens/Login';
 import PrincipalUsuario from './screens/PrincipalUsuario';
-import MinhasBicicletasScreen from './screens/MinhasBicicletasScreen'; // Adicione isso
+import MinhasBicicletasScreen from './screens/MinhasBicicletasScreen'; 
 import AdicionarBicicletaScreen from './screens/AdicionarBicicletaScreen';
 import PrincipalLojista from './screens/PrincipalLojista'; 
 import Lojas from './screens/Lojas';
+import Historico from './screens/Historico';
 
 const Stack = createStackNavigator();
 
@@ -47,8 +48,14 @@ function MyStack() {
         <Stack.Screen
         name="Lojas"
         component={Lojas}
-        options={{ tittle:'Lojas' }}
+        options={{ title:'Lojas' }}
         />
+        <Stack.Screen
+        name="Historico"
+        component={Historico}
+        options={{ title:'Historico'}}
+        />
+
     </Stack.Navigator>
   );
 }

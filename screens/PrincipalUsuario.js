@@ -31,7 +31,7 @@ const PrincipalUsuario = ({ navigation, route }) => {
       {/* Botão para exibir Minhas Bicicletas */}
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate('MinhasBicicletas', { id_usuario: 1})} // Passa o id_usuario para a tela de Minhas Bicicletas
+        onPress={() => navigation.navigate('MinhasBicicletas', { id_usuario: 1 })} // Passa o id_usuario para a tela de Minhas Bicicletas
       >
         <Text style={styles.buttonText}>VER MINHAS BICICLETAS</Text>
       </TouchableOpacity>
@@ -39,7 +39,7 @@ const PrincipalUsuario = ({ navigation, route }) => {
       {/* Botão "Adicionar Nova Bicicleta" */}
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() => navigation.navigate('AdicionarBicicleta', { id_usuario: 1})} // Passa o id_usuario para a tela de Adicionar Bicicleta
+        onPress={() => navigation.navigate('AdicionarBicicleta', { id_usuario: 1 })} // Passa o id_usuario para a tela de Adicionar Bicicleta
       >
         <Text style={styles.addButtonText}>ADICIONAR NOVA BICICLETA +</Text>
       </TouchableOpacity>
@@ -50,6 +50,14 @@ const PrincipalUsuario = ({ navigation, route }) => {
         onPress={() => navigation.navigate('Lojas')} // Navega para a tela de Lojas
       >
         <Text style={styles.lojasButtonText}>VER LOJAS</Text>
+      </TouchableOpacity>
+
+      {/* Botão para exibir Histórico */}
+      <TouchableOpacity
+        style={styles.historicoButton}
+        onPress={() => navigation.navigate('Historico')} // Navega para a tela de Histórico
+      >
+        <Text style={styles.historicoButtonText}>VER HISTÓRICO</Text>
       </TouchableOpacity>
     </View>
   );
@@ -123,7 +131,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   lojasButton: {
-    backgroundColor: '#007BFF', // Cor do botão para Lojas
+    backgroundColor: '#007BFF',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -131,6 +139,19 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   lojasButtonText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  historicoButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  historicoButtonText: {
     color: '#FFF',
     fontSize: 18,
     fontWeight: 'bold',

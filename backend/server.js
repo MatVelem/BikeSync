@@ -230,6 +230,39 @@ app.get('/historico/:idLojista', (req, res) => {
   });
 });
 
+app.get('/relatorios/:id_lojista', async (req, res) => {
+  const { id_lojista } = req.params;
+  try {
+    const result = await new Promise((resolve, reject) => {
+      connection.query(`
+        SELECT tipo AS name, COUNT(*) AS quantidade 
+        FROM Servicos 
+        WHERE id_lojista = ? 
+        GROUP BY tipo
+      `, [id_lojista], (err, results) => {
+        if (err) {
+          reject(err);  // Rejeita a Promise se houver erro
+        } else {
+          resolve(results);  // Resolve com os resultados
+        }
+      });
+    });
+
+    // Calculando o total de serviços
+    const totalServicos = result.reduce((acc, curr) => acc + curr.quantidade, 0);
+
+    // Enviando os dados do relatório e o total de serviços
+    res.json({
+      data: result,
+      totalServicos,  // Incluindo o total de serviços no retorno
+    });
+  } catch (error) {
+    console.error('Erro ao carregar dados do relatório:', error);
+    res.status(500).json({ error: 'Erro ao carregar dados do relatório' });
+  }
+});
+
+
 
 
 const port = 3000; 

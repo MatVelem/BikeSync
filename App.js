@@ -10,6 +10,7 @@ import PrincipalLojista from './screens/PrincipalLojista';
 import Lojas from './screens/Lojas';
 import HistoricoServicosLojista from './screens/HistoricoServicosLojista';
 import Historico from './screens/Historico';
+import RelatorioLojista from './screens/RelatorioLojista';
 
 const Stack = createStackNavigator();
 
@@ -41,6 +42,12 @@ function MyStack() {
         name="HistoricoServicosLojista" 
         component={HistoricoServicosLojista} 
         options={{ title: 'HistoricoServicosLojista' }}
+        />
+
+        <Stack.Screen 
+        name="RelatorioLojista" 
+        component={RelatorioLojista} 
+        options={{ title: 'RelatorioLojista' }}
         />
 
       <Stack.Screen 

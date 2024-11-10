@@ -2,76 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from 'react-native';
 
 const Lojista = ({ navigation, route }) => {
-  const [agendamentos, setAgendamentos] = useState([]);
-  const [relatorios, setRelatorios] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  // Função para buscar agendamentos
-  const fetchAgendamentos = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/agendamentos'); // Certifique-se de que esta URL está correta
-      return await response.json();
-    } catch (error) {
-      console.error('Erro ao buscar agendamentos:', error);
-      return [];
-    }
-  };
-
-  // Função para buscar relatórios
-  const fetchRelatorios = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/relatorios'); // Certifique-se de que esta URL está correta
-      return await response.json();
-    } catch (error) {
-      console.error('Erro ao buscar relatórios:', error);
-      return [];
-    }
-  };
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const agendamentosData = await fetchAgendamentos();
-        const relatoriosData = await fetchRelatorios();
-        setAgendamentos(agendamentosData);
-        setRelatorios(relatoriosData);
-      } catch (error) {
-        console.error('Erro ao buscar dados:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, []);
-
-  const renderAgendamentoItem = ({ item }) => (
-    <View style={styles.item}>
-      <Text style={styles.itemText}>Cliente: {item.nome_cliente}</Text>
-      <Text style={styles.itemText}>Data: {item.data_agendamento}</Text>
-      <Text style={styles.itemText}>Serviço: {item.servico}</Text>
-    </View>
-  );
-
-  const renderRelatorioItem = ({ item }) => (
-    <View style={styles.item}>
-      <Text style={styles.itemText}>Relatório de: {item.tipo}</Text>
-      <Text style={styles.itemText}>Data: {item.data}</Text>
-      <Text style={styles.itemText}>Descrição: {item.descricao}</Text>
-    </View>
-  );
-
-  if (loading) {
-    return <Text>Carregando...</Text>;
-  }
-
+  const {id_lojista } = route.params;
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Image source={require('../assets/bikesyncimagem.png')} style={styles.logo} />
         <View style={styles.icons}>
           <Image source={{ uri: '../assets/usuario.png' }} style={styles.icon} />
-          <Image source={{ uri: 'https://link-do-icone-perfil.com/icone.png' }} style={styles.icon} />
         </View>
       </View>
 
@@ -79,22 +16,16 @@ const Lojista = ({ navigation, route }) => {
         <Text style={styles.welcomeText}>Painel do Lojista</Text>
       </View>
 
-      <Text style={styles.subtitle}>Agendamentos</Text>
-      <FlatList
-        data={agendamentos}
-        renderItem={renderAgendamentoItem}
-        keyExtractor={item => item.id_agendamento.toString()}
-        style={styles.list}
-      />
-
-      <Text style={styles.subtitle}>Relatórios</Text>
-      <FlatList
-        data={relatorios}
-        renderItem={renderRelatorioItem}
-        keyExtractor={item => item.id_relatorio.toString()}
-        style={styles.list}
-      />
-
+      <TouchableOpacity
+         style={styles.historicoButton}
+        onPress={() => {
+        console.log('ID do lojista:', route.params.id_lojista); // Verificar se o id está correto
+        navigation.navigate('HistoricoServicosLojista', { id_lojista: route.params.id_lojista });
+         }}
+        >
+       <Text style={styles.historicoButtonText}>HISTÓRICO</Text>
+      </TouchableOpacity>
+      
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate('Relatorio', { id_lojista: route.params.id_lojista })}
@@ -195,6 +126,19 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  historicoButton: {
+    backgroundColor: '#8B4513',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  historicoButtonText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },  
 });
 
 export default Lojista;

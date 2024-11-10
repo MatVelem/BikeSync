@@ -161,10 +161,11 @@ app.delete('/bicicletas/:id_bicicleta', (req, res) => {
 app.get('/historico/:idLojista', (req, res) => {
   const { idLojista } = req.params;
   const query = `
-      SELECT Historico.descricao, Historico.data_registro, Bicicleta.modelo, Servicos.tipo
+     SELECT Historico.descricao, Historico.data_registro, Bicicleta.modelo, Servicos.tipo, Usuario.nome, Usuario.email, Usuario.telefone
       FROM Historico
       INNER JOIN Servicos ON Historico.id_servico = Servicos.id_servico
       INNER JOIN Bicicleta ON Historico.id_bicicleta = Bicicleta.id_bicicleta
+      INNER JOIN Usuario ON Bicicleta.id_usuario = Usuario.id_usuario
       WHERE Servicos.id_lojista = ?
       ORDER BY Historico.data_registro DESC;
   `;

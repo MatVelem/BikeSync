@@ -160,25 +160,39 @@ app.delete('/bicicletas/:id_bicicleta', (req, res) => {
 // Endpoint para obter histórico
 app.get('/historico/:idLojista', (req, res) => {
   const { idLojista } = req.params;
-  const query = `
+  const { data, tipoFiltro } = req.query;  // Recebe a data e o tipo de filtro
+
+  // Inicia a consulta SQL base
+  let query = `
      SELECT Historico.descricao, Historico.data_registro, Bicicleta.modelo, Servicos.tipo, Usuario.nome, Usuario.email, Usuario.telefone
-      FROM Historico
-      INNER JOIN Servicos ON Historico.id_servico = Servicos.id_servico
-      INNER JOIN Bicicleta ON Historico.id_bicicleta = Bicicleta.id_bicicleta
-      INNER JOIN Usuario ON Bicicleta.id_usuario = Usuario.id_usuario
-      WHERE Servicos.id_lojista = ?
-      ORDER BY Historico.data_registro DESC;
+     FROM Historico
+     INNER JOIN Servicos ON Historico.id_servico = Servicos.id_servico
+     INNER JOIN Bicicleta ON Historico.id_bicicleta = Bicicleta.id_bicicleta
+     INNER JOIN Usuario ON Bicicleta.id_usuario = Usuario.id_usuario
+     WHERE Servicos.id_lojista = ?
   `;
+  
+  // Adiciona o filtro de data, dependendo do tipo de filtro
+  if (data) {
+    if (tipoFiltro === 'ate') {
+      query += ` AND DATE(Historico.data_registro) <= ?`;  // Registros até a data selecionada
+    } else if (tipoFiltro === 'antes') {
+      query += ` AND DATE(Historico.data_registro) < ?`;  // Registros antes da data selecionada
+    }
+  }
+
+  query += ` ORDER BY Historico.data_registro DESC;`;
 
   // Usando a conexão correta para executar a consulta
-  connection.query(query, [idLojista], (err, results) => {
-      if (err) {
-          console.error("Erro ao buscar o histórico:", err);
-          return res.status(500).send("Erro ao buscar o histórico");
-      }
-      res.json(results);
+  connection.query(query, [idLojista, data], (err, results) => {
+    if (err) {
+      console.error("Erro ao buscar o histórico:", err);
+      return res.status(500).send("Erro ao buscar o histórico");
+    }
+    res.json(results);
   });
 });
+
 
 const port = 3000; 
 app.listen(port, () => {

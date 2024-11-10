@@ -127,7 +127,8 @@ app.post('/login', (req, res) => {
             message: 'Login bem-sucedido!',
             user: {
               nome: user.nome, 
-              id_usuario: user.id_usuario 
+              id_usuario: user.id_usuario,
+              id_lojista: user.id_lojista
             },
           });
         } else {
@@ -190,26 +191,42 @@ app.get('/historico', (req, res) => {
 
 
 
-// Simulação dos dados (substitua pelo acesso ao banco de dados real)
-const agendamentos = [
-  { id_agendamento: 1, nome_cliente: 'Carlos', data_agendamento: '2023-10-28', servico: 'Reparo' },
-  { id_agendamento: 2, nome_cliente: 'Maria', data_agendamento: '2023-10-29', servico: 'Manutenção' },
-];
+// Endpoint para obter histórico
+app.get('/historico/:idLojista', (req, res) => {
+  const { idLojista } = req.params;
+  const { data, tipoFiltro } = req.query;  // Recebe a data e o tipo de filtro
 
-const relatorios = [
-  { id_relatorio: 1, tipo: 'Financeiro', data: '2023-10-28', descricao: 'Relatório mensal de finanças' },
-  { id_relatorio: 2, tipo: 'Serviços', data: '2023-10-29', descricao: 'Serviços realizados em outubro' },
-];
+  // Inicia a consulta SQL base
+  let query = `
+     SELECT Historico.descricao, Historico.data_registro, Bicicleta.modelo, Servicos.tipo, Usuario.nome, Usuario.email, Usuario.telefone
+     FROM Historico
+     INNER JOIN Servicos ON Historico.id_servico = Servicos.id_servico
+     INNER JOIN Bicicleta ON Historico.id_bicicleta = Bicicleta.id_bicicleta
+     INNER JOIN Usuario ON Bicicleta.id_usuario = Usuario.id_usuario
+     WHERE Servicos.id_lojista = ?
+  `;
+  
+  // Adiciona o filtro de data, dependendo do tipo de filtro
+  if (data) {
+    if (tipoFiltro === 'ate') {
+      query += ` AND DATE(Historico.data_registro) <= ?`;  // Registros até a data selecionada
+    } else if (tipoFiltro === 'antes') {
+      query += ` AND DATE(Historico.data_registro) < ?`;  // Registros antes da data selecionada
+    }
+  }
 
-// Endpoint para obter agendamentos
-app.get('/agendamentos', (req, res) => {
-  res.json(agendamentos);
+  query += ` ORDER BY Historico.data_registro DESC;`;
+
+  // Usando a conexão correta para executar a consulta
+  connection.query(query, [idLojista, data], (err, results) => {
+    if (err) {
+      console.error("Erro ao buscar o histórico:", err);
+      return res.status(500).send("Erro ao buscar o histórico");
+    }
+    res.json(results);
+  });
 });
 
-// Endpoint para obter relatórios
-app.get('/relatorios', (req, res) => {
-  res.json(relatorios);
-});
 
 const port = 3000; 
 app.listen(port, () => {

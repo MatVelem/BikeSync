@@ -48,12 +48,14 @@ export default function Login({ navigation, route }) {
           if (tipoLogin === 'lojista') {
             navigation.reset({ 
               index: 0, 
-              routes: [{ name: 'PrincipalLojista', params: { nome: data.user.nome } }] 
+              routes: [{ name: 'PrincipalLojista', params: { nome: data.user.nome ,
+                id_lojista: data.user.id_lojista
+              } }] 
             });
           } else {
             navigation.reset({ 
               index: 0, 
-              routes: [{ name: 'PrincipalUsuario', params: { nome: data.user.nome } }] 
+              routes: [{ name: 'PrincipalUsuario', params: { nome: data.user.nome, id_usuario: data.user.id_usuario } }] 
             });
           }
         }

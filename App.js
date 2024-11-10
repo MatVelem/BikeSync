@@ -8,7 +8,7 @@ import MinhasBicicletasScreen from './screens/MinhasBicicletasScreen';
 import AdicionarBicicletaScreen from './screens/AdicionarBicicletaScreen';
 import PrincipalLojista from './screens/PrincipalLojista'; 
 import Lojas from './screens/Lojas';
-import Historico from './screens/Historico';
+import HistoricoServicosLojista from './screens/HistoricoServicosLojista';
 
 const Stack = createStackNavigator();
 
@@ -32,9 +32,16 @@ function MyStack() {
       />
        <Stack.Screen 
         name="PrincipalLojista" 
-        component={PrincipalLojista} // Adicione isso
+        component={PrincipalLojista} 
         options={{ title: 'PrincipalLojista' }}
         />
+
+        <Stack.Screen 
+        name="HistoricoServicosLojista" 
+        component={HistoricoServicosLojista} 
+        options={{ title: 'HistoricoServicosLojista' }}
+        />
+
       <Stack.Screen 
         name="MinhasBicicletas" 
         component={MinhasBicicletasScreen} 
@@ -42,7 +49,7 @@ function MyStack() {
       />
       <Stack.Screen 
         name="AdicionarBicicleta" 
-        component={AdicionarBicicletaScreen} // Adicione isso
+        component={AdicionarBicicletaScreen} 
         options={{ title: 'Adicionar Bicicleta' }}
         />
         <Stack.Screen

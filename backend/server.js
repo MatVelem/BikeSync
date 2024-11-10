@@ -191,7 +191,6 @@ app.get('/historico', (req, res) => {
 
 
 
-// Endpoint para obter histórico
 app.get('/historico/:idLojista', (req, res) => {
   const { idLojista } = req.params;
   const { data, tipoFiltro } = req.query;  // Recebe a data e o tipo de filtro
@@ -207,18 +206,22 @@ app.get('/historico/:idLojista', (req, res) => {
   `;
   
   // Adiciona o filtro de data, dependendo do tipo de filtro
+  const queryParams = [idLojista];
+  
   if (data) {
     if (tipoFiltro === 'ate') {
       query += ` AND DATE(Historico.data_registro) <= ?`;  // Registros até a data selecionada
+      queryParams.push(data);  // Adiciona a data como parâmetro
     } else if (tipoFiltro === 'antes') {
       query += ` AND DATE(Historico.data_registro) < ?`;  // Registros antes da data selecionada
+      queryParams.push(data);  // Adiciona a data como parâmetro
     }
   }
 
   query += ` ORDER BY Historico.data_registro DESC;`;
 
   // Usando a conexão correta para executar a consulta
-  connection.query(query, [idLojista, data], (err, results) => {
+  connection.query(query, queryParams, (err, results) => {
     if (err) {
       console.error("Erro ao buscar o histórico:", err);
       return res.status(500).send("Erro ao buscar o histórico");
@@ -226,6 +229,7 @@ app.get('/historico/:idLojista', (req, res) => {
     res.json(results);
   });
 });
+
 
 
 const port = 3000; 

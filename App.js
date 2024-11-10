@@ -9,6 +9,7 @@ import AdicionarBicicletaScreen from './screens/AdicionarBicicletaScreen';
 import PrincipalLojista from './screens/PrincipalLojista'; 
 import Lojas from './screens/Lojas';
 import HistoricoServicosLojista from './screens/HistoricoServicosLojista';
+import Historico from './screens/Historico';
 
 const Stack = createStackNavigator();
 

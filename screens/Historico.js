@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from 'react-native';
 import axios from 'axios';
 
-const Historico = () => {
+const Historico = ({ navigation }) => {
   const [historico, setHistorico] = useState([]);
   const [error, setError] = useState(null);
 
@@ -10,7 +11,6 @@ const Historico = () => {
   const fetchHistorico = async () => {
     try {
       const response = await axios.get('/historico');
-      console.log(response.data);
       if (Array.isArray(response.data)) {
         setHistorico(response.data);
       } else {
@@ -27,49 +27,114 @@ const Historico = () => {
   }, []);
 
   return (
-    <div>
-      <h1>Histórico de Serviços</h1>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Image source={require('../assets/bikesyncimagem.png')} style={styles.logo} />
+        <View style={styles.icons}>
+          <Image source={{ uri: '../assets/usuario.png' }} style={styles.icon} />
+        </View>
+      </View>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <View style={styles.welcomeContainer}>
+        <Text style={styles.welcomeText}>Histórico de Serviços</Text>
+      </View>
 
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr>
-            <th style={{ border: '1px solid black' }}>ID</th>
-            <th style={{ border: '1px solid black' }}>Descrição</th>
-            <th style={{ border: '1px solid black' }}>Data do Registro</th>
-            <th style={{ border: '1px solid black' }}>ID da Bicicleta</th>
-            <th style={{ border: '1px solid black' }}>ID do Serviço</th>
-            <th style={{ border: '1px solid black' }}>Tipo do Serviço</th>
-            <th style={{ border: '1px solid black' }}>Preço</th>
-          </tr>
-        </thead>
-        <tbody>
-          {historico.length > 0 ? (
-            historico.map((item) => (
-              <tr key={item.id_historico}>
-                <td style={{ border: '1px solid black' }}>{item.id_historico}</td>
-                <td style={{ border: '1px solid black' }}>{item.descricao}</td>
-                <td style={{ border: '1px solid black' }}>{item.data_registro}</td>
-                <td style={{ border: '1px solid black' }}>{item.id_bicicleta}</td>
-                <td style={{ border: '1px solid black' }}>{item.id_servico}</td>
-                <td style={{ border: '1px solid black' }}>{item.tipo || 'N/A'}</td>
-                <td style={{ border: '1px solid black' }}>{item.preco || 'N/A'}</td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="7" style={{ textAlign: 'center', border: '1px solid black' }}>
-                Nenhum registro encontrado
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
+      {error && <Text style={styles.errorText}>{error}</Text>}
+
+      <FlatList
+        data={historico}
+        renderItem={({ item }) => (
+          <View style={styles.item}>
+            <Text style={styles.itemText}>ID: {item.id_historico}</Text>
+            <Text style={styles.itemText}>Descrição: {item.descricao}</Text>
+            <Text style={styles.itemText}>Data: {item.data_registro}</Text>
+            <Text style={styles.itemText}>Preço: {item.preco || 'N/A'}</Text>
+          </View>
+        )}
+        keyExtractor={(item) => item.id_historico.toString()}
+        contentContainerStyle={styles.listContainer}
+      />
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate('Agendar', { id_lojista: 1 })} // Altere para o ID do lojista
+      >
+        <Text style={styles.buttonText}>AGENDAR NOVO SERVIÇO</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
-<script src="/AppEntry.bundle?platform=web&dev=true" defer></script>
+// Estilos
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#FFB400',
+    padding: 20,
+    justifyContent: 'space-between',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  logo: {
+    width: 200,
+    height: 100,
+    resizeMode: 'contain',
+  },
+  icons: {
+    flexDirection: 'row',
+  },
+  icon: {
+    width: 50,
+    height: 50,
+    marginLeft: 10,
+  },
+  welcomeContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  welcomeText: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  listContainer: {
+    marginBottom: 20,
+  },
+  item: {
+    backgroundColor: '#FFF',
+    padding: 15,
+    borderRadius: 10,
+    marginVertical: 5,
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  itemText: {
+    fontSize: 16,
+    color: '#000',
+  },
+  button: {
+    backgroundColor: '#D32F2F',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  buttonText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+});
 
 export default Historico;

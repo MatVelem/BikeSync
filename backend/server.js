@@ -157,71 +157,32 @@ app.delete('/bicicletas/:id_bicicleta', (req, res) => {
   });
 });
 
-app.get('/historico', (req, res) => {
-  const { id_bicicleta } = req.query; // Parâmetro de consulta opcional
-
-  // Monta a consulta com base na presença do parâmetro id_bicicleta
-  let sql = `
+// Rota para histórico de usuário
+app.get('/historico/usuario/:idUsuario', (req, res) => {
+  const { idUsuario } = req.params;
+  
+  // Sua consulta SQL para o histórico do usuário
+  let query = `
     SELECT 
       h.id_historico, 
       h.descricao, 
       h.data_registro, 
-      h.id_bicicleta, 
+      b.modelo,
+      m.nome_marca,
       h.id_servico,
       s.tipo, 
-      s.preco
+      s.preco,
+      l.nome_loja
     FROM Historico h
+    INNER JOIN Bicicleta b ON h.id_bicicleta = b.id_bicicleta
+    INNER JOIN Marca m ON b.id_marca = m.id_marca
     LEFT JOIN Servicos s ON h.id_servico = s.id_servico
-  `;
-
-  // Se um id_bicicleta for passado, aplica o filtro
-  if (id_bicicleta) {
-    sql += ` WHERE h.id_bicicleta = ?`;
-  }
-
-  connection.query(sql, [id_bicicleta].filter(Boolean), (err, results) => {
-    if (err) {
-      console.error('Erro ao buscar histórico:', err);
-      return res.status(500).json({ error: 'Erro ao buscar histórico' });
-    }
-    console.log('Resultados da consulta:', results); // Verifique os dados retornados
-    res.json(results);
-  });
-});
-
-
-
-app.get('/historico/:idLojista', (req, res) => {
-  const { idLojista } = req.params;
-  const { data, tipoFiltro } = req.query;  // Recebe a data e o tipo de filtro
-
-  // Inicia a consulta SQL base
-  let query = `
-     SELECT Historico.descricao, Historico.data_registro, Bicicleta.modelo, Servicos.tipo, Usuario.nome, Usuario.email, Usuario.telefone
-     FROM Historico
-     INNER JOIN Servicos ON Historico.id_servico = Servicos.id_servico
-     INNER JOIN Bicicleta ON Historico.id_bicicleta = Bicicleta.id_bicicleta
-     INNER JOIN Usuario ON Bicicleta.id_usuario = Usuario.id_usuario
-     WHERE Servicos.id_lojista = ?
+    INNER JOIN Lojista l ON s.id_lojista = l.id_lojista
+    WHERE b.id_usuario = ?
+    ORDER BY h.data_registro DESC;
   `;
   
-  // Adiciona o filtro de data, dependendo do tipo de filtro
-  const queryParams = [idLojista];
-  
-  if (data) {
-    if (tipoFiltro === 'ate') {
-      query += ` AND DATE(Historico.data_registro) <= ?`;  // Registros até a data selecionada
-      queryParams.push(data);  // Adiciona a data como parâmetro
-    } else if (tipoFiltro === 'antes') {
-      query += ` AND DATE(Historico.data_registro) < ?`;  // Registros antes da data selecionada
-      queryParams.push(data);  // Adiciona a data como parâmetro
-    }
-  }
-
-  query += ` ORDER BY Historico.data_registro DESC;`;
-
-  // Usando a conexão correta para executar a consulta
-  connection.query(query, queryParams, (err, results) => {
+  connection.query(query, [idUsuario], (err, results) => {
     if (err) {
       console.error("Erro ao buscar o histórico:", err);
       return res.status(500).send("Erro ao buscar o histórico");
@@ -248,6 +209,78 @@ app.get('/servicos', (req, res) => {
     res.json(results); // Retorna todos os campos selecionados
   });
 });
+
+
+// Rota para histórico de lojista
+app.get('/historico/lojista/:idLojista', (req, res) => {
+  const { idLojista } = req.params;
+  const { data, tipoFiltro } = req.query;
+
+  // Sua consulta SQL para o histórico do lojista
+  let query = `
+     SELECT Historico.descricao, Historico.data_registro, Bicicleta.modelo, Servicos.tipo, Usuario.nome, Usuario.email, Usuario.telefone
+     FROM Historico
+     INNER JOIN Servicos ON Historico.id_servico = Servicos.id_servico
+     INNER JOIN Bicicleta ON Historico.id_bicicleta = Bicicleta.id_bicicleta
+     INNER JOIN Usuario ON Bicicleta.id_usuario = Usuario.id_usuario
+     WHERE Servicos.id_lojista = ?
+  `;
+  
+  const queryParams = [idLojista];
+  
+  if (data) {
+    if (tipoFiltro === 'ate') {
+      query += ` AND DATE(Historico.data_registro) <= ?`;
+      queryParams.push(data);
+    } else if (tipoFiltro === 'antes') {
+      query += ` AND DATE(Historico.data_registro) < ?`;
+      queryParams.push(data);
+    }
+  }
+
+  query += ` ORDER BY Historico.data_registro DESC;`;
+
+  connection.query(query, queryParams, (err, results) => {
+    if (err) {
+      console.error("Erro ao buscar o histórico:", err);
+      return res.status(500).send("Erro ao buscar o histórico");
+    }
+    res.json(results);
+  });
+});
+
+app.get('/relatorios/:id_lojista', async (req, res) => {
+  const { id_lojista } = req.params;
+  try {
+    const result = await new Promise((resolve, reject) => {
+      connection.query(`
+        SELECT tipo AS name, COUNT(*) AS quantidade 
+        FROM Servicos 
+        WHERE id_lojista = ? 
+        GROUP BY tipo
+      `, [id_lojista], (err, results) => {
+        if (err) {
+          reject(err);  // Rejeita a Promise se houver erro
+        } else {
+          resolve(results);  // Resolve com os resultados
+        }
+      });
+    });
+
+    // Calculando o total de serviços
+    const totalServicos = result.reduce((acc, curr) => acc + curr.quantidade, 0);
+
+    // Enviando os dados do relatório e o total de serviços
+    res.json({
+      data: result,
+      totalServicos,  // Incluindo o total de serviços no retorno
+    });
+  } catch (error) {
+    console.error('Erro ao carregar dados do relatório:', error);
+    res.status(500).json({ error: 'Erro ao carregar dados do relatório' });
+  }
+});
+
 
 
 

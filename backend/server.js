@@ -157,35 +157,35 @@ app.delete('/bicicletas/:id_bicicleta', (req, res) => {
   });
 });
 
-app.get('/historico', (req, res) => {
-  const { id_bicicleta } = req.query; // Parâmetro de consulta opcional
+app.get('/historico/:idUsuario', (req, res) => {
+  const { idUsuario } = req.params;  // Recebe o id do usuário da URL
 
-  // Monta a consulta com base na presença do parâmetro id_bicicleta
-  let sql = `
+  // A consulta correta que você deseja
+  let query = `
     SELECT 
       h.id_historico, 
       h.descricao, 
       h.data_registro, 
-      h.id_bicicleta, 
+      b.modelo,
+      m.nome_marca,
       h.id_servico,
       s.tipo, 
       s.preco
     FROM Historico h
+    INNER JOIN Bicicleta b ON h.id_bicicleta = b.id_bicicleta
+    INNER JOIN Marca m ON b.id_marca = m.id_marca
     LEFT JOIN Servicos s ON h.id_servico = s.id_servico
+    WHERE b.id_usuario = ?
+    ORDER BY h.data_registro DESC;
   `;
 
-  // Se um id_bicicleta for passado, aplica o filtro
-  if (id_bicicleta) {
-    sql += ` WHERE h.id_bicicleta = ?`;
-  }
-
-  connection.query(sql, [id_bicicleta].filter(Boolean), (err, results) => {
+  // Executa a consulta SQL, passando o idUsuario como parâmetro
+  connection.query(query, [idUsuario], (err, results) => {
     if (err) {
-      console.error('Erro ao buscar histórico:', err);
-      return res.status(500).json({ error: 'Erro ao buscar histórico' });
+      console.error("Erro ao buscar o histórico:", err);
+      return res.status(500).send("Erro ao buscar o histórico");
     }
-    console.log('Resultados da consulta:', results); // Verifique os dados retornados
-    res.json(results);
+    res.json(results);  // Retorna os resultados
   });
 });
 

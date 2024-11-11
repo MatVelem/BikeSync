@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from 'react-native';
 import axios from 'axios';
+import { Modal } from 'react-native';  // Importando Modal
 
-const Historico = ({ navigation }) => {
+const Historico = ({ navigation, route }) => {
+  const { id_usuario } = route.params;  // Recebendo o id_usuario
   const [historico, setHistorico] = useState([]);
   const [error, setError] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedService, setSelectedService] = useState(null);
 
   axios.defaults.baseURL = 'http://localhost:3000';
 
   const fetchHistorico = async () => {
     try {
-      const response = await axios.get('/historico');
+      const response = await axios.get(`/historico/${id_usuario}`);
       if (Array.isArray(response.data)) {
         setHistorico(response.data);
       } else {
@@ -20,6 +24,16 @@ const Historico = ({ navigation }) => {
       console.error('Erro ao buscar histórico:', error);
       setError('Erro ao carregar histórico. Tente novamente mais tarde.');
     }
+  };
+
+  const openModal = (item) => {
+    setSelectedService(item);
+    setIsModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+    setSelectedService(null);
   };
 
   useEffect(() => {
@@ -45,22 +59,44 @@ const Historico = ({ navigation }) => {
         data={historico}
         renderItem={({ item }) => (
           <View style={styles.item}>
-            <Text style={styles.itemText}>ID: {item.id_historico}</Text>
             <Text style={styles.itemText}>Descrição: {item.descricao}</Text>
             <Text style={styles.itemText}>Data: {item.data_registro}</Text>
-            <Text style={styles.itemText}>Preço: {item.preco || 'N/A'}</Text>
+            <Text style={styles.itemText}>Modelo: {item.modelo || 'N/A'}</Text>
+            <Text style={styles.itemText}>Marca: {item.nome_marca || 'N/A'}</Text>
+            <TouchableOpacity onPress={() => openModal(item)} style={styles.button}>
+              <Text style={styles.buttonText}>Ver Detalhes</Text>
+            </TouchableOpacity>
           </View>
         )}
         keyExtractor={(item) => item.id_historico.toString()}
         contentContainerStyle={styles.listContainer}
       />
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate('Agendar', { id_lojista: 1 })} // Altere para o ID do lojista
+      {/* Modal de Detalhes */}
+      <Modal
+        visible={isModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={closeModal}
       >
-        <Text style={styles.buttonText}>AGENDAR NOVO SERVIÇO</Text>
-      </TouchableOpacity>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            {selectedService && (
+              <>
+                <Text style={styles.modalTitle}>Detalhes do Serviço</Text>
+                <Text style={styles.modalText}>Descrição: {selectedService.descricao}</Text>
+                <Text style={styles.modalText}>Data: {selectedService.data_registro}</Text>
+                <Text style={styles.modalText}>Preço: {selectedService.preco || 'N/A'}</Text>
+                <Text style={styles.modalText}>Modelo: {selectedService.modelo || 'N/A'}</Text>
+                <Text style={styles.modalText}>Marca: {selectedService.nome_marca || 'N/A'}</Text>
+                <TouchableOpacity onPress={closeModal} style={styles.buttonClose}>
+                  <Text style={styles.buttonCloseText}>Fechar</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -128,11 +164,45 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 5,
     alignItems: 'center',
-    marginBottom: 20,
+    marginTop: 10,
   },
   buttonText: {
     color: '#FFF',
     fontSize: 18,
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContainer: {
+    backgroundColor: '#FFF',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  modalText: {
+    fontSize: 16,
+    marginBottom: 8,
+  },
+  buttonClose: {
+    backgroundColor: '#FF6F00',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 25,
+    marginTop: 15,
+    alignItems: 'center',
+  },
+  buttonCloseText: {
+    color: '#FFF',
+    fontSize: 16,
     fontWeight: 'bold',
   },
 });

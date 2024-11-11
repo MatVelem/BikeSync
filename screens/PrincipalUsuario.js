@@ -31,7 +31,7 @@ const PrincipalUsuario = ({ navigation, route }) => {
       {/* Botão para exibir Minhas Bicicletas */}
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate('MinhasBicicletas', { id_usuario: 1 })} // Passa o id_usuario para a tela de Minhas Bicicletas
+        onPress={() => navigation.navigate('MinhasBicicletas', { id_usuario })} // Passa o id_usuario para a tela de Minhas Bicicletas
       >
         <Text style={styles.buttonText}>VER MINHAS BICICLETAS</Text>
       </TouchableOpacity>
@@ -39,7 +39,7 @@ const PrincipalUsuario = ({ navigation, route }) => {
       {/* Botão "Adicionar Nova Bicicleta" */}
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() => navigation.navigate('AdicionarBicicleta', { id_usuario: 1 })} // Passa o id_usuario para a tela de Adicionar Bicicleta
+        onPress={() => navigation.navigate('AdicionarBicicleta', { id_usuario })} // Passa o id_usuario para a tela de Adicionar Bicicleta
       >
         <Text style={styles.addButtonText}>ADICIONAR NOVA BICICLETA +</Text>
       </TouchableOpacity>
@@ -55,7 +55,7 @@ const PrincipalUsuario = ({ navigation, route }) => {
       {/* Botão para exibir Histórico */}
       <TouchableOpacity
         style={styles.historicoButton}
-        onPress={() => navigation.navigate('Historico')} // Navega para a tela de Histórico
+        onPress={() => navigation.navigate('Historico', { id_usuario })} // Passa o id_usuario para a tela de Histórico
       >
         <Text style={styles.historicoButtonText}>VER HISTÓRICO</Text>
       </TouchableOpacity>
@@ -63,7 +63,7 @@ const PrincipalUsuario = ({ navigation, route }) => {
   );
 };
 
-// Definição dos estilos
+// Estilos
 const styles = StyleSheet.create({
   container: {
     flex: 1,

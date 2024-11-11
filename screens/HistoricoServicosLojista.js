@@ -16,7 +16,7 @@ const HistoricoServicosLojista = ({ route }) => {
   const fetchHistorico = async (filterDate = '', tipoFiltro = '') => {
     setLoading(true);
     try {
-      let url = `http://localhost:3000/historico/${id_lojista}`;
+      let url = `http://localhost:3000/historico/lojista/${id_lojista}`;
       if (filterDate) {
         url += `?data=${filterDate}&tipoFiltro=${tipoFiltro}`;
       }

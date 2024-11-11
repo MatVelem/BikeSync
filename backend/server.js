@@ -157,10 +157,11 @@ app.delete('/bicicletas/:id_bicicleta', (req, res) => {
   });
 });
 
-app.get('/historico/:idUsuario', (req, res) => {
-  const { idUsuario } = req.params;  // Recebe o id do usuário da URL
-
-  // A consulta correta que você deseja
+// Rota para histórico de usuário
+app.get('/historico/usuario/:idUsuario', (req, res) => {
+  const { idUsuario } = req.params;
+  
+  // Sua consulta SQL para o histórico do usuário
   let query = `
     SELECT 
       h.id_historico, 
@@ -170,32 +171,33 @@ app.get('/historico/:idUsuario', (req, res) => {
       m.nome_marca,
       h.id_servico,
       s.tipo, 
-      s.preco
+      s.preco,
+      l.nome_loja
     FROM Historico h
     INNER JOIN Bicicleta b ON h.id_bicicleta = b.id_bicicleta
     INNER JOIN Marca m ON b.id_marca = m.id_marca
     LEFT JOIN Servicos s ON h.id_servico = s.id_servico
+    INNER JOIN Lojista l ON s.id_lojista = l.id_lojista
     WHERE b.id_usuario = ?
     ORDER BY h.data_registro DESC;
   `;
-
-  // Executa a consulta SQL, passando o idUsuario como parâmetro
+  
   connection.query(query, [idUsuario], (err, results) => {
     if (err) {
       console.error("Erro ao buscar o histórico:", err);
       return res.status(500).send("Erro ao buscar o histórico");
     }
-    res.json(results);  // Retorna os resultados
+    res.json(results);
   });
 });
 
 
-
-app.get('/historico/:idLojista', (req, res) => {
+// Rota para histórico de lojista
+app.get('/historico/lojista/:idLojista', (req, res) => {
   const { idLojista } = req.params;
-  const { data, tipoFiltro } = req.query;  // Recebe a data e o tipo de filtro
+  const { data, tipoFiltro } = req.query;
 
-  // Inicia a consulta SQL base
+  // Sua consulta SQL para o histórico do lojista
   let query = `
      SELECT Historico.descricao, Historico.data_registro, Bicicleta.modelo, Servicos.tipo, Usuario.nome, Usuario.email, Usuario.telefone
      FROM Historico
@@ -205,22 +207,20 @@ app.get('/historico/:idLojista', (req, res) => {
      WHERE Servicos.id_lojista = ?
   `;
   
-  // Adiciona o filtro de data, dependendo do tipo de filtro
   const queryParams = [idLojista];
   
   if (data) {
     if (tipoFiltro === 'ate') {
-      query += ` AND DATE(Historico.data_registro) <= ?`;  // Registros até a data selecionada
-      queryParams.push(data);  // Adiciona a data como parâmetro
+      query += ` AND DATE(Historico.data_registro) <= ?`;
+      queryParams.push(data);
     } else if (tipoFiltro === 'antes') {
-      query += ` AND DATE(Historico.data_registro) < ?`;  // Registros antes da data selecionada
-      queryParams.push(data);  // Adiciona a data como parâmetro
+      query += ` AND DATE(Historico.data_registro) < ?`;
+      queryParams.push(data);
     }
   }
 
   query += ` ORDER BY Historico.data_registro DESC;`;
 
-  // Usando a conexão correta para executar a consulta
   connection.query(query, queryParams, (err, results) => {
     if (err) {
       console.error("Erro ao buscar o histórico:", err);

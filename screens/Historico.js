@@ -14,7 +14,7 @@ const Historico = ({ navigation, route }) => {
 
   const fetchHistorico = async () => {
     try {
-      const response = await axios.get(`/historico/${id_usuario}`);
+      const response = await axios.get(`/historico/usuario/${id_usuario}`);
       if (Array.isArray(response.data)) {
         setHistorico(response.data);
       } else {
@@ -63,6 +63,7 @@ const Historico = ({ navigation, route }) => {
             <Text style={styles.itemText}>Data: {item.data_registro}</Text>
             <Text style={styles.itemText}>Modelo: {item.modelo || 'N/A'}</Text>
             <Text style={styles.itemText}>Marca: {item.nome_marca || 'N/A'}</Text>
+            {/* Removido nome da loja daqui */}
             <TouchableOpacity onPress={() => openModal(item)} style={styles.button}>
               <Text style={styles.buttonText}>Ver Detalhes</Text>
             </TouchableOpacity>
@@ -89,6 +90,8 @@ const Historico = ({ navigation, route }) => {
                 <Text style={styles.modalText}>Preço: {selectedService.preco || 'N/A'}</Text>
                 <Text style={styles.modalText}>Modelo: {selectedService.modelo || 'N/A'}</Text>
                 <Text style={styles.modalText}>Marca: {selectedService.nome_marca || 'N/A'}</Text>
+                {/* Nome da loja agora aparece no modal */}
+                <Text style={styles.modalText}>Loja: {selectedService.nome_loja || 'N/A'}</Text>
                 <TouchableOpacity onPress={closeModal} style={styles.buttonClose}>
                   <Text style={styles.buttonCloseText}>Fechar</Text>
                 </TouchableOpacity>

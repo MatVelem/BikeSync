@@ -10,6 +10,9 @@ import PrincipalLojista from './screens/PrincipalLojista';
 import Lojas from './screens/Lojas';
 import HistoricoServicosLojista from './screens/HistoricoServicosLojista';
 import Historico from './screens/Historico';
+import Servicos from './screens/Servicos';
+import EscolherBicicletaScreen from './screens/EscolherBicicleta';
+import RelatorioLojista from './screens/RelatorioLojista';
 
 const Stack = createStackNavigator();
 
@@ -48,6 +51,13 @@ function MyStack() {
         component={MinhasBicicletasScreen} 
         options={{ title: 'Minhas Bicicletas' }}
       />
+
+      <Stack.Screen 
+        name="RelatorioLojista" 
+        component={RelatorioLojista} 
+        options={{ title: 'RelatorioLojista' }}
+        />
+
       <Stack.Screen 
         name="AdicionarBicicleta" 
         component={AdicionarBicicletaScreen} 
@@ -63,6 +73,17 @@ function MyStack() {
         component={Historico}
         options={{ title:'Historico'}}
         />
+      <Stack.Screen
+      name="Servicos"
+      component={Servicos}
+      options={{ title:'Serviços'}}
+      />
+      <Stack.Screen
+      name="EscolherBicicleta"
+      component={EscolherBicicletaScreen}
+      options={{ title:'Agendar serviço'}}
+      />
+
 
     </Stack.Navigator>
   );

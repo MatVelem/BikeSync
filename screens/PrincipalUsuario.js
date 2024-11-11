@@ -59,6 +59,14 @@ const PrincipalUsuario = ({ navigation, route }) => {
       >
         <Text style={styles.historicoButtonText}>VER HISTÓRICO</Text>
       </TouchableOpacity>
+
+      {/* Novo botão para exibir Serviços */}
+      <TouchableOpacity
+        style={styles.servicosButton}
+        onPress={() => navigation.navigate('EscolherBicicleta', { id_usuario: 1 })} // Navega para a tela de Serviços
+      >
+        <Text style={styles.servicosButtonText}>AGENDAR UM SERVIÇO</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -152,6 +160,19 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   historicoButtonText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  servicosButton: {
+    backgroundColor: '#FF5722',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  servicosButtonText: {
     color: '#FFF',
     fontSize: 18,
     fontWeight: 'bold',

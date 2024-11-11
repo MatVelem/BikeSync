@@ -230,6 +230,25 @@ app.get('/historico/:idLojista', (req, res) => {
   });
 });
 
+app.get('/servicos', (req, res) => {
+  const sql = `
+    SELECT 
+      id_servico, 
+      tipo, 
+      descricao, 
+      preco, 
+      data_servico, 
+      status 
+    FROM Servicos;
+  `;
+  connection.query(sql, (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: 'Erro ao buscar serviços' });
+    }
+    res.json(results); // Retorna todos os campos selecionados
+  });
+});
+
 
 
 const port = 3000; 

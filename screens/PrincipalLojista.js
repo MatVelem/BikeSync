@@ -28,10 +28,11 @@ const Lojista = ({ navigation, route }) => {
       
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate('Relatorio', { id_lojista: route.params.id_lojista })}
+        onPress={() => navigation.navigate('RelatorioLojista', { id_lojista })}
       >
-        <Text style={styles.buttonText}>VER RELATÓRIOS DETALHADOS</Text>
+        <Text style={styles.buttonText}>Acessar Relatórios</Text>
       </TouchableOpacity>
+
 
       <TouchableOpacity
         style={styles.addButton}

@@ -199,7 +199,7 @@ app.get('/historico/lojista/:idLojista', (req, res) => {
 
   // Sua consulta SQL para o histórico do lojista
   let query = `
-     SELECT Historico.descricao, Historico.data_registro, Bicicleta.modelo, Servicos.tipo, Usuario.nome, Usuario.email, Usuario.telefone
+     SELECT Historico.descricao, Historico.data_registro, Bicicleta.modelo, Servicos.tipo, Usuario.nome, Usuario.email, Usuario.telefone, Servicos.descricao_servico
      FROM Historico
      INNER JOIN Servicos ON Historico.id_servico = Servicos.id_servico
      INNER JOIN Bicicleta ON Historico.id_bicicleta = Bicicleta.id_bicicleta
@@ -211,10 +211,10 @@ app.get('/historico/lojista/:idLojista', (req, res) => {
   
   if (data) {
     if (tipoFiltro === 'ate') {
-      query += ` AND DATE(Historico.data_registro) <= ?`;
+      query += ` AND Historico.data_registro <= ?`;
       queryParams.push(data);
     } else if (tipoFiltro === 'antes') {
-      query += ` AND DATE(Historico.data_registro) < ?`;
+      query += ` AND Historico.data_registro < ?`;
       queryParams.push(data);
     }
   }
@@ -260,6 +260,28 @@ app.get('/relatorios/:id_lojista', async (req, res) => {
     console.error('Erro ao carregar dados do relatório:', error);
     res.status(500).json({ error: 'Erro ao carregar dados do relatório' });
   }
+});
+
+
+// Rota para obter o valor total dos serviços prestados por um lojista
+app.get('/valorTotalServicos/:id_lojista', (req, res) => {
+  const { id_lojista } = req.params;
+  
+  const query = `
+    SELECT SUM(preco) AS valorTotal 
+    FROM Servicos 
+    WHERE id_lojista = ?
+  `;
+  
+  connection.query(query, [id_lojista], (err, results) => {
+    if (err) {
+      console.error('Erro ao calcular o valor total dos serviços:', err);
+      return res.status(500).send({ error: 'Erro ao calcular o valor total dos serviços' });
+    }
+    res.json({
+      valorTotal: results[0].valorTotal || 0, // Retorna 0 se o valor total for nulo
+    });
+  });
 });
 
 

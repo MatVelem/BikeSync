@@ -125,6 +125,7 @@ const HistoricoServicosLojista = ({ route }) => {
                 <Text style={styles.modalText}>Tipo de Serviço: {selectedItem.tipo}</Text>
                 <Text style={styles.modalText}>Email: {selectedItem.email}</Text>
                 <Text style={styles.modalText}>Telefone: {selectedItem.telefone}</Text>
+                <Text style={styles.modalText}>Descrição do Serviço: {selectedItem.descricao_servico}</Text>
               </>
             )}
             <TouchableOpacity onPress={handleCloseModal} style={styles.buttonClose}>

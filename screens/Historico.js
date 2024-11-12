@@ -26,15 +26,19 @@ const Historico = ({ navigation, route }) => {
     }
   };
 
-  const openModal = (item) => {
-    setSelectedService(item);
-    setIsModalVisible(true);
-  };
+  
 
   const closeModal = () => {
     setIsModalVisible(false);
     setSelectedService(null);
   };
+
+  const openModal = (item) => {
+    setSelectedService(item);
+    setIsModalVisible(true);
+  };
+
+  
 
   useEffect(() => {
     fetchHistorico();

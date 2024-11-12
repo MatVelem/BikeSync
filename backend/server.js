@@ -191,6 +191,25 @@ app.get('/historico/usuario/:idUsuario', (req, res) => {
   });
 });
 
+app.get('/servicos', (req, res) => {
+  const sql = `
+    SELECT 
+      id_servico, 
+      tipo, 
+      descricao, 
+      preco, 
+      data_servico, 
+      status 
+    FROM Servicos;
+  `;
+  connection.query(sql, (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: 'Erro ao buscar serviços' });
+    }
+    res.json(results); // Retorna todos os campos selecionados
+  });
+});
+
 
 // Rota para histórico de lojista
 app.get('/historico/lojista/:idLojista', (req, res) => {

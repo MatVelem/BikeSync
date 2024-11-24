@@ -63,7 +63,7 @@ const PrincipalUsuario = ({ navigation, route }) => {
       {/* Novo botão para exibir Serviços */}
       <TouchableOpacity
         style={styles.servicosButton}
-        onPress={() => navigation.navigate('EscolherBicicleta', { id_usuario: 1 })} // Navega para a tela de Serviços
+        onPress={() => navigation.navigate('LojasScreen', { id_usuario })} // Navega para a tela de Serviços
       >
         <Text style={styles.servicosButtonText}>AGENDAR UM SERVIÇO</Text>
       </TouchableOpacity>

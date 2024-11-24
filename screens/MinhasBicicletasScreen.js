@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, Button, Alert, StyleSheet } from 'react-native';
+import { View, Text, FlatList, Button, Alert, StyleSheet, Modal } from 'react-native';
 
 const MinhasBicicletasScreen = ({ route }) => {
   const { id_usuario } = route.params || {}; 
   const [bicicletas, setBicicletas] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false); // Estado para controlar o Modal
+  const [bicicletaToDelete, setBicicletaToDelete] = useState(null); // Estado para armazenar a bicicleta que será excluída
 
   useEffect(() => {
     const fetchBicicletas = async () => {
@@ -41,6 +43,23 @@ const MinhasBicicletasScreen = ({ route }) => {
     }
   };
 
+  const showDeleteConfirmation = (bicicleta) => {
+    setBicicletaToDelete(bicicleta);
+    setIsModalVisible(true); // Exibe o modal
+  };
+
+  const confirmDelete = () => {
+    if (bicicletaToDelete) {
+      handleDelete(bicicletaToDelete.id_bicicleta);
+      setIsModalVisible(false); // Fecha o modal após a confirmação
+    }
+  };
+
+  const cancelDelete = () => {
+    setIsModalVisible(false); // Fecha o modal sem excluir
+    setBicicletaToDelete(null); // Limpa a bicicleta selecionada para exclusão
+  };
+
   if (!id_usuario) {
     return (
       <View style={styles.container}>
@@ -57,7 +76,7 @@ const MinhasBicicletasScreen = ({ route }) => {
         keyExtractor={(item) => item.id_bicicleta.toString()}
         renderItem={({ item }) => (
           <View style={styles.bicicletaContainer}>
-            <Text>Marca: {item.marca}</Text> {/* Exibe o nome da marca */}
+            <Text>Marca: {item.marca}</Text>
             <Text>Modelo: {item.modelo}</Text>
             <Text>Ano: {item.ano}</Text>
             <Text>Cor: {item.cor}</Text>
@@ -67,12 +86,33 @@ const MinhasBicicletasScreen = ({ route }) => {
             <Text>Informações Adicionais: {item.informacoes_adicionais}</Text>
             <Button
               title="Excluir Bicicleta"
-              onPress={() => handleDelete(item.id_bicicleta)}
+              onPress={() => showDeleteConfirmation(item)}
               color="red"
             />
           </View>
         )}
       />
+
+      {/* Modal de Confirmação */}
+      <Modal
+        visible={isModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={cancelDelete}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Confirmar Exclusão</Text>
+            <Text style={styles.modalMessage}>
+              Tem certeza que deseja excluir a bicicleta {bicicletaToDelete?.modelo}?
+            </Text>
+            <View style={styles.modalActions}>
+              <Button title="Cancelar" onPress={cancelDelete} />
+              <Button title="Excluir" onPress={confirmDelete} color="red" />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -101,40 +141,32 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fundo semitransparente
+  },
+  modalContainer: {
+    width: 300,
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
     alignItems: 'center',
   },
-  bikeTitle: {
+  modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#000',
+    marginBottom: 10,
   },
-  iconsContainer: {
+  modalMessage: {
+    fontSize: 16,
+    marginBottom: 20,
+  },
+  modalActions: {
     flexDirection: 'row',
-  },
-  deleteIcon: {
-    color: '#FF0000',
-    fontSize: 20,
-    marginRight: 10,
-  },
-  editIcon: {
-    color: '#0000FF',
-    fontSize: 20,
-  },
-  bikeInfo: {
-    marginTop: 10,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  value: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 5,
+    justifyContent: 'space-between',
+    width: '100%',
   },
 });
 

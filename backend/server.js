@@ -61,6 +61,24 @@ app.get('/api/lojas', (req, res) => {
   });
 });
 
+// Endpoint para listar serviços de um lojista específico
+app.get('/api/lojistas/:id_lojista/servicos', (req, res) => {
+  const { id_lojista } = req.params;
+  const sql = `
+    SELECT Servicos.id_servico, Servicos.tipo, Servicos.descricao_servico, Servicos.preco, Servicos.data_servico, Servicos.status
+    FROM Servicos
+    WHERE Servicos.id_lojista = ?`;
+  
+  connection.query(sql, [id_lojista], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Erro ao carregar serviços.');
+    }
+    res.json(results);
+  });
+});
+
+
 // Rota para obter todas as bicicletas (com JOIN para exibir nome da marca)
 app.get('/api/bicicletas', (req, res) => {
   const sql = `SELECT b.id_bicicleta, m.nome_marca AS marca, b.modelo, b.ano, b.tamanho_roda, b.serial, b.tipo, b.cor, b.material, b.kit_transmissao, b.tamanho_quadro, b.informacoes_adicionais, b.id_usuario 
@@ -188,6 +206,27 @@ app.get('/historico/usuario/:idUsuario', (req, res) => {
       return res.status(500).send("Erro ao buscar o histórico");
     }
     res.json(results);
+  });
+});
+// Rota para adicionar serviço para o lojista com preço
+app.post('/servicos/lojista/:id_lojista', (req, res) => {
+  const { id_lojista } = req.params;
+  const { nome_tipo, descricao, preco } = req.body;  // Alterado tipo_servico para nome_tipo
+
+  if (!nome_tipo || !descricao || !preco || preco <= 0) {
+    return res.status(400).send({ message: 'Todos os campos são obrigatórios e o preço deve ser válido.' });
+  }
+
+  const sql = 'INSERT INTO TipoServico (lojista_id, nome_tipo, descricao, preco) VALUES (?, ?, ?, ?)';  // Alterado tipo_servico para nome_tipo
+  connection.query(sql, [id_lojista, nome_tipo, descricao, preco], (err, result) => {
+    if (err) {
+      console.error("Erro ao adicionar serviço:", err);
+      return res.status(500).send({ message: 'Erro ao adicionar serviço', error: err });
+    }
+    res.status(200).send({
+      message: 'Serviço adicionado com sucesso!',
+      servico: { id_servico: result.insertId, nome_tipo, descricao, preco }  // Alterado tipo_servico para nome_tipo
+    });
   });
 });
 

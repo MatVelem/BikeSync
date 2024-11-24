@@ -110,12 +110,12 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
-          <Button title="Adicionar Bicicleta" onPress={handleAdicionarBicicleta} />
+          <Button title="Adicionar Bicicleta" onPress={handleAdicionarBicicleta} color="#000" />
 
-          <Text>Marca*:</Text>
+          <Text style={styles.label}>Marca*:</Text>
           <Picker
             selectedValue={marcaSelecionada}
-            style={styles.input}
+            style={styles.picker}
             onValueChange={(itemValue) => setMarcaSelecionada(itemValue)}
           >
             <Picker.Item label="Selecione uma marca" value="" />
@@ -124,7 +124,7 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
             ))}
           </Picker>
 
-          <Text>Modelo*:</Text>
+          <Text style={styles.label}>Modelo*:</Text>
           <TextInput
             style={styles.input}
             value={modelo}
@@ -132,7 +132,7 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
             placeholder="Modelo"
           />
 
-          <Text>Ano*:</Text>
+          <Text style={styles.label}>Ano*:</Text>
           <TextInput
             style={styles.input}
             value={ano}
@@ -141,7 +141,7 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
             placeholder="Ano"
           />
 
-          <Text>Tamanho da Roda*:</Text>
+          <Text style={styles.label}>Tamanho da Roda*:</Text>
           <TextInput
             style={styles.input}
             value={tamanhoRoda}
@@ -150,7 +150,7 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
             placeholder="Tamanho da Roda"
           />
 
-          <Text>Serial*:</Text>
+          <Text style={styles.label}>Serial*:</Text>
           <TextInput
             style={styles.input}
             value={serial}
@@ -158,7 +158,7 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
             placeholder="Serial"
           />
 
-          <Text>Tipo:</Text>
+          <Text style={styles.label}>Tipo:</Text>
           <TextInput
             style={styles.input}
             value={tipo}
@@ -166,7 +166,7 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
             placeholder="Tipo"
           />
 
-          <Text>Cor:</Text>
+          <Text style={styles.label}>Cor:</Text>
           <TextInput
             style={styles.input}
             value={cor}
@@ -174,7 +174,7 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
             placeholder="Cor"
           />
 
-          <Text>Material:</Text>
+          <Text style={styles.label}>Material:</Text>
           <TextInput
             style={styles.input}
             value={material}
@@ -182,7 +182,7 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
             placeholder="Material"
           />
 
-          <Text>Kit de Transmissão:</Text>
+          <Text style={styles.label}>Kit de Transmissão:</Text>
           <TextInput
             style={styles.input}
             value={kitTransmissao}
@@ -190,7 +190,7 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
             placeholder="Kit de Transmissão"
           />
 
-          <Text>Tamanho do Quadro:</Text>
+          <Text style={styles.label}>Tamanho do Quadro:</Text>
           <TextInput
             style={styles.input}
             value={tamanhoQuadro}
@@ -198,9 +198,9 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
             placeholder="Tamanho do Quadro"
           />
 
-          <Text>Informações Adicionais:</Text>
+          <Text style={styles.label}>Informações Adicionais:</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, styles.textArea]}
             value={informacoesAdicionais}
             onChangeText={setInformacoesAdicionais}
             multiline
@@ -216,15 +216,35 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#FFD700',
+    backgroundColor: '#FFB400', // Cor de fundo atualizada
+  },
+  label: {
+    color: '#333',
+    fontSize: 16,
+    marginVertical: 5,
+    fontWeight: 'bold',
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#333',
     borderRadius: 5,
     padding: 10,
     backgroundColor: '#fff',
-    marginBottom: 10,
+    marginBottom: 15,
+  },
+  picker: {
+    borderWidth: 1,
+    borderColor: '#333',
+    borderRadius: 5,
+    backgroundColor: '#000', // Fundo preto para o Picker
+    color: '#fff', // Texto branco
+    marginBottom: 15,
+  },
+  textArea: {
+    height: 100,
+  },
+  scrollContainer: {
+    paddingBottom: 20,
   },
 });
 

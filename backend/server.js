@@ -219,13 +219,30 @@ app.delete('/servicos/:id_servico', (req, res) => {
   const { id_servico } = req.params;
 
   // Query para excluir o serviço pelo id
-  const sql = 'DELETE FROM TipoServico WHERE id_servico = ?';  // Alterado para refletir a tabela TipoServico
+  const sql = 'DELETE FROM TipoServico WHERE id_tipo_servico = ?';  // Alterado para refletir a tabela TipoServico
   connection.query(sql, [id_servico], (err, result) => {
     if (err) {
       console.error("Erro ao remover serviço:", err);
       return res.status(500).send({ message: 'Erro ao remover serviço', error: err });
     }
     res.status(200).send({ message: 'Serviço removido com sucesso!' });
+  });
+});
+
+app.get('/servicos/lojista/:id_lojista', (req, res) => {
+  const { id_lojista } = req.params;
+
+  const sql = 'SELECT * FROM TipoServico WHERE lojista_id = ?';
+  connection.query(sql, [id_lojista], (err, results) => {
+    if (err) {
+      console.error("Erro ao buscar serviços:", err);
+      return res.status(500).send({ message: 'Erro ao buscar serviços', error: err });
+    }
+
+    res.status(200).send({
+      message: results.length === 0 ? 'Nenhum serviço encontrado.' : 'Serviços encontrados com sucesso.',
+      services: results
+    });
   });
 });
 

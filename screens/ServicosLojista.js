@@ -1,34 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert, TextInput, Modal } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, Modal, ActivityIndicator } from 'react-native';
 
 const ServicosLojista = ({ navigation, route }) => {
   const { id_lojista } = route.params;
   const [servicos, setServicos] = useState([]);
-  const [tipoServicos, setTipoServicos] = useState([]);
-  const [preco, setPreco] = useState('');
   const [nomeTipo, setNomeTipo] = useState('');
   const [descricao, setDescricao] = useState('');
+  const [preco, setPreco] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Carregar os tipos de serviços e serviços atribuídos ao lojista
+  // Carregar os serviços do lojista
   useEffect(() => {
     const fetchServicos = async () => {
       try {
-        const response = await fetch('http://localhost:3000/servicos');
+        const response = await fetch(`http://localhost:3000/servicos/lojista/${id_lojista}`);
         if (!response.ok) throw new Error('Erro ao buscar serviços');
         const data = await response.json();
-        setTipoServicos(data);
+        setServicos(data.services); // Atualiza o estado com os serviços do lojista
       } catch (error) {
         console.error('Erro ao buscar serviços:', error);
-      }
-
-      try {
-        const response = await fetch(`http://localhost:3000/api/servicos/${id_lojista}`);
-        if (!response.ok) throw new Error('Erro ao buscar serviços do lojista');
-        const data = await response.json();
-        setServicos(data);
-      } catch (error) {
-        console.error('Erro ao buscar serviços do lojista:', error);
+      } finally {
+        setLoading(false); // Finaliza o carregamento
       }
     };
 
@@ -60,7 +53,7 @@ const ServicosLojista = ({ navigation, route }) => {
       if (!response.ok) throw new Error('Erro ao adicionar serviço');
 
       const data = await response.json();
-      setServicos([...servicos, data.servico]);
+      setServicos([...servicos, data.servico]); // Adiciona o novo serviço
       setPreco('');
       setDescricao('');
       setNomeTipo('');
@@ -81,7 +74,7 @@ const ServicosLojista = ({ navigation, route }) => {
       if (!response.ok) throw new Error('Erro ao remover serviço');
 
       const data = await response.json();
-      setServicos(servicos.filter(s => s.id_servico !== idServico));
+      setServicos(servicos.filter(s => s.id_servico !== idServico)); // Remove o serviço da lista
       Alert.alert('Serviço removido!', data.message);
     } catch (error) {
       console.error('Erro ao remover serviço:', error);
@@ -89,25 +82,33 @@ const ServicosLojista = ({ navigation, route }) => {
     }
   };
 
-  const renderItem = ({ item }) => (
-    <View style={styles.item}>
-      <Text style={styles.itemText}>{item.nome_tipo} - {item.descricao} | Preço: R$ {item.preco}</Text>
-      <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveService(item.id_servico)}>
-        <Text style={styles.removeButtonText}>Remover</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Serviços do Lojista</Text>
 
-      <FlatList
-        data={servicos}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id_servico.toString()}
-        ListEmptyComponent={<Text style={styles.noServiceText}>Sem serviços adicionados</Text>}
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color="#007BFF" />
+      ) : (
+        <View style={styles.servicesContainer}>
+          {servicos.length > 0 ? (
+            servicos.map((item) => (
+              <View key={item.id_servico} style={styles.item}>
+                <Text style={styles.itemText}>
+                  {item.nome_tipo} - {item.descricao} | Preço: R$ {item.preco}
+                </Text>
+                <TouchableOpacity
+                  style={styles.removeButton}
+                  onPress={() => handleRemoveService(item.id_servico)}
+                >
+                  <Text style={styles.removeButtonText}>Remover</Text>
+                </TouchableOpacity>
+              </View>
+            ))
+          ) : (
+            <Text style={styles.noServiceText}>Sem serviços adicionados</Text>
+          )}
+        </View>
+      )}
 
       <TouchableOpacity
         style={styles.addServiceButton}
@@ -126,7 +127,6 @@ const ServicosLojista = ({ navigation, route }) => {
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Adicionar Novo Serviço</Text>
 
-            {/* Campo nome_tipo */}
             <TextInput
               style={styles.input}
               placeholder="Nome do Tipo de Serviço"
@@ -134,7 +134,6 @@ const ServicosLojista = ({ navigation, route }) => {
               onChangeText={setNomeTipo}
             />
 
-            {/* Campo Descrição do Serviço */}
             <TextInput
               style={styles.input}
               placeholder="Descrição do Serviço"
@@ -142,7 +141,6 @@ const ServicosLojista = ({ navigation, route }) => {
               onChangeText={setDescricao}
             />
 
-            {/* Campo Preço */}
             <TextInput
               style={styles.input}
               placeholder="Preço (R$)"
@@ -178,6 +176,9 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
+    marginBottom: 20,
+  },
+  servicesContainer: {
     marginBottom: 20,
   },
   item: {
@@ -224,7 +225,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContainer: {
     backgroundColor: '#fff',
@@ -254,22 +255,19 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 10,
     alignItems: 'center',
-    width: '100%',
   },
   addButtonText: {
     color: '#fff',
     fontWeight: 'bold',
   },
   closeButton: {
-    backgroundColor: '#D32F2F',
+    backgroundColor: '#ccc',
     padding: 10,
     borderRadius: 5,
-    marginTop: 10,
     alignItems: 'center',
-    width: '100%',
   },
   closeButtonText: {
-    color: '#fff',
+    color: '#000',
     fontWeight: 'bold',
   },
 });

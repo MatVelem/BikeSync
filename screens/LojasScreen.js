@@ -9,8 +9,7 @@ const LojasScreen = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedLoja, setSelectedLoja] = useState(null);
-  const [servicos, setServicos] = useState([]);
- 
+  const [tiposServicos, setTiposServicos] = useState([]);
 
   useEffect(() => {
     const fetchLojas = async () => {
@@ -27,44 +26,42 @@ const LojasScreen = () => {
     fetchLojas();
   }, []);
 
-  const fetchServicos = async (id_lojista) => {
+  const fetchTiposServicos = async (id_lojista) => {
     try {
       const response = await axios.get(`http://localhost:3000/api/lojistas/${id_lojista}/servicos`);
-      setServicos(response.data);
+      setTiposServicos(response.data);
     } catch (err) {
-      setError('Erro ao carregar os serviços');
+      setError('Erro ao carregar os tipos de serviços');
     }
   };
 
-  const handleSelectServico = (id_servico, id_usuario) => {
-    // Navegar para a tela 'EscolherBicicleta' passando o id_servico e id_usuario
-    navigation.navigate('EscolherBicicleta', { id_servico, id_usuario: 1});
+  const handleSelectServico = (id_tipo_servico, id_usuario) => {
+    // Navegar para a tela 'EscolherBicicleta' passando o id_tipo_servico e id_usuario
+    navigation.navigate('EscolherBicicleta', { id_tipo_servico, id_usuario: 1 });
   };
-  
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.item}
       onPress={() => {
         setSelectedLoja(item);
-        fetchServicos(item.id_lojista); // Busca os serviços ao selecionar a loja
+        fetchTiposServicos(item.id_lojista); // Busca os tipos de serviços ao selecionar a loja
       }}
     >
       <Text style={styles.itemText}>Nome: {item.nome_loja}</Text>
     </TouchableOpacity>
   );
 
-  const renderServico = ({ item }) => (
+  const renderTipoServico = ({ item }) => (
     <View style={styles.servicoItem}>
-      <Text style={styles.servicoText}>Tipo: {item.tipo}</Text>
-      <Text style={styles.servicoText}>Descrição: {item.descricao_servico}</Text>
+      <Text style={styles.servicoText}>Tipo: {item.nome_tipo}</Text>
+      <Text style={styles.servicoText}>Descrição: {item.descricao}</Text>
       <Text style={styles.servicoText}>Preço: R$ {item.preco}</Text>
-      
 
       {/* Botão para selecionar o serviço */}
       <TouchableOpacity
         style={styles.selectButton}
-        onPress={() => handleSelectServico(item.id_servico)}
+        onPress={() => handleSelectServico(item.id_tipo_servico)}
       >
         <Text style={styles.selectButtonText}>Selecionar</Text>
       </TouchableOpacity>
@@ -86,14 +83,14 @@ const LojasScreen = () => {
         renderItem={renderItem}
         keyExtractor={(item) => item.id_lojista.toString()}
       />
-      
-      {selectedLoja && servicos.length > 0 && (
+
+      {selectedLoja && tiposServicos.length > 0 && (
         <View style={styles.detailsContainer}>
-          <Text style={styles.detailsText}>Serviços da loja {selectedLoja.nome_loja}:</Text>
+          <Text style={styles.detailsText}>Tipos de serviços da loja {selectedLoja.nome_loja}:</Text>
           <FlatList
-            data={servicos}
-            renderItem={renderServico}
-            keyExtractor={(item) => item.id_servico.toString()}
+            data={tiposServicos}
+            renderItem={renderTipoServico}
+            keyExtractor={(item) => item.id_tipo_servico.toString()}
           />
         </View>
       )}

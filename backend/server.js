@@ -61,22 +61,29 @@ app.get('/api/lojas', (req, res) => {
   });
 });
 
-// Endpoint para listar serviços de um lojista específico
+// Endpoint para listar tipos de serviços de um lojista específico
 app.get('/api/lojistas/:id_lojista/servicos', (req, res) => {
   const { id_lojista } = req.params;
   const sql = `
-    SELECT Servicos.id_servico, Servicos.tipo, Servicos.descricao_servico, Servicos.preco, Servicos.data_servico, Servicos.status
-    FROM Servicos
-    WHERE Servicos.id_lojista = ?`;
-  
+    SELECT 
+      TipoServico.id_tipo_servico, 
+      TipoServico.nome_tipo, 
+      TipoServico.descricao, 
+      TipoServico.preco 
+    FROM 
+      TipoServico
+    WHERE 
+      TipoServico.lojista_id = ?`;
+
   connection.query(sql, [id_lojista], (err, results) => {
     if (err) {
       console.error(err);
-      return res.status(500).send('Erro ao carregar serviços.');
+      return res.status(500).send('Erro ao carregar tipos de serviços.');
     }
     res.json(results);
   });
 });
+
 
 
 // Rota para obter todas as bicicletas (com JOIN para exibir nome da marca)

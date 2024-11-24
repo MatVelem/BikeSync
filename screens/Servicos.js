@@ -41,9 +41,8 @@ const ServicosScreen = ({ route }) => {
             keyExtractor={(item) => item.id_servico.toString()}
             renderItem={({ item }) => (
               <View style={styles.servicoItem}>
-                <Text style={styles.servicoTipo}>{item.tipo}</Text> {/* Exibe o tipo do serviço */}
+                <Text style={styles.servicoTipo}>{item.nome_tipo}</Text> {/* Exibe o tipo do serviço */}
                 <Text style={styles.servicoDescricao}>{item.descricao}</Text> {/* Exibe a descrição do serviço */}
-                <Text style={styles.servicoPreco}>Preço: R$ {item.preco}</Text> {/* Exibe o preço do serviço */}
                 <Button title="Agendar Serviço" onPress={() => alert('Serviço agendado')} />
               </View>
             )}

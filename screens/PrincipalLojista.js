@@ -36,9 +36,9 @@ const Lojista = ({ navigation, route }) => {
 
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() => navigation.navigate('Agendar', { id_lojista: route.params.id_lojista })}
+        onPress={() => navigation.navigate('ServiçosLojista', { id_lojista: route.params.id_lojista })}
       >
-        <Text style={styles.addButtonText}>AGENDAR NOVO SERVIÇO</Text>
+        <Text style={styles.addButtonText}>Serviços</Text>
       </TouchableOpacity>
     </View>
   );

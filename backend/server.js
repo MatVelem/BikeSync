@@ -191,22 +191,41 @@ app.get('/historico/usuario/:idUsuario', (req, res) => {
   });
 });
 
-app.get('/servicos', (req, res) => {
-  const sql = `
-    SELECT 
-      id_servico, 
-      tipo, 
-      descricao, 
-      preco, 
-      data_servico, 
-      status 
-    FROM Servicos;
-  `;
-  connection.query(sql, (err, results) => {
+// Rota para adicionar serviço para o lojista com preço
+app.post('/servicos/lojista/:id_lojista', (req, res) => {
+  const { id_lojista } = req.params;
+  const { nome_tipo, descricao, preco } = req.body;  // Alterado tipo_servico para nome_tipo
+
+  if (!nome_tipo || !descricao || !preco || preco <= 0) {
+    return res.status(400).send({ message: 'Todos os campos são obrigatórios e o preço deve ser válido.' });
+  }
+
+  const sql = 'INSERT INTO TipoServico (lojista_id, nome_tipo, descricao, preco) VALUES (?, ?, ?, ?)';  // Alterado tipo_servico para nome_tipo
+  connection.query(sql, [id_lojista, nome_tipo, descricao, preco], (err, result) => {
     if (err) {
-      return res.status(500).json({ error: 'Erro ao buscar serviços' });
+      console.error("Erro ao adicionar serviço:", err);
+      return res.status(500).send({ message: 'Erro ao adicionar serviço', error: err });
     }
-    res.json(results); // Retorna todos os campos selecionados
+    res.status(200).send({
+      message: 'Serviço adicionado com sucesso!',
+      servico: { id_servico: result.insertId, nome_tipo, descricao, preco }  // Alterado tipo_servico para nome_tipo
+    });
+  });
+});
+
+
+// Rota para remover serviço
+app.delete('/servicos/:id_servico', (req, res) => {
+  const { id_servico } = req.params;
+
+  // Query para excluir o serviço pelo id
+  const sql = 'DELETE FROM TipoServico WHERE id_servico = ?';  // Alterado para refletir a tabela TipoServico
+  connection.query(sql, [id_servico], (err, result) => {
+    if (err) {
+      console.error("Erro ao remover serviço:", err);
+      return res.status(500).send({ message: 'Erro ao remover serviço', error: err });
+    }
+    res.status(200).send({ message: 'Serviço removido com sucesso!' });
   });
 });
 

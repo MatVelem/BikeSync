@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Image, TextInput } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const ConfirmarServicoScreen = ({ route }) => {
   const { id_usuario, id_bicicleta, id_tipo_servico, id_lojista } = route.params || {};
@@ -10,6 +11,7 @@ const ConfirmarServicoScreen = ({ route }) => {
   const [lojista, setLojista] = useState(null);
   const [observacoes, setObservacoes] = useState('');
   const [confirmacao, setConfirmacao] = useState(false);
+  const navigation = useNavigation(); // Hook de navegação
 
   useEffect(() => {
     if (id_bicicleta) {
@@ -23,7 +25,7 @@ const ConfirmarServicoScreen = ({ route }) => {
       fetch(`http://localhost:3000/api/tiposervico/${id_tipo_servico}`)
         .then(response => response.json())
         .then(data => {
-          console.log('Serviço:', data); // Adicione esta linha para verificar os dados do serviço
+          console.log('Serviço:', data); // Verificar os dados do serviço
           setServico(data);
         })
         .catch(error => console.error('Erro ao carregar serviço:', error));
@@ -37,7 +39,15 @@ const ConfirmarServicoScreen = ({ route }) => {
     }
   }, [id_bicicleta, id_tipo_servico, id_lojista]);
   
-
+  useEffect(() => {
+    if (confirmacao) {
+      const timer = setTimeout(() => {
+        navigation.navigate('PrincipalUsuario', { id_usuario }); // Redirecionar após 7 segundos
+      }, 7000);
+      return () => clearTimeout(timer); // Limpar o timeout se o componente for desmontado
+    }
+  }, [confirmacao, navigation, id_usuario]);
+  
   const criarOrdemServico = () => {
     setLoading(true);
     setErro(''); // Limpar erro antes da solicitação
@@ -73,7 +83,6 @@ const ConfirmarServicoScreen = ({ route }) => {
         console.error('Erro ao criar ordem de serviço:', error);
       });
   };
-  
 
   return (
     <View style={styles.container}>
@@ -94,6 +103,13 @@ const ConfirmarServicoScreen = ({ route }) => {
             source={require('../assets/sucesso.png')}
             style={styles.successImage}
           />
+          <Text style={styles.redirectText}>Redirecionando para a página principal...</Text>
+          <TouchableOpacity 
+            style={styles.manualButton} 
+            onPress={() => navigation.navigate('PrincipalUsuario', { id_usuario })}
+          >
+            <Text style={styles.manualButtonText}>Voltar agora</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <>
@@ -229,6 +245,25 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150,
     resizeMode: 'contain',
+  },
+  redirectText: {
+    fontSize: 16,
+    color: '#000',
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  manualButton: {
+    backgroundColor: '#007BFF',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  manualButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 

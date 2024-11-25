@@ -29,10 +29,11 @@ const EscolherBicicletaScreen = ({ navigation, route }) => {
     navigation.navigate('ConfirmarServicoScreen', {
       id_usuario,
       id_bicicleta: bicicleta.id_bicicleta,
-      id_lojista, // Passei id_lojista
-      id_tipo_servico,
+      id_lojista,
+      id_tipo_servico, // Certifique-se de que está passando id_tipo_servico
     });
   };
+  
 
   if (loading) {
     return (

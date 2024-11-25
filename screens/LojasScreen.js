@@ -38,7 +38,7 @@ const LojasScreen = ({ route }) => {
 
   const handleSelectServico = (id_tipo_servico, id_lojista) => {
    
-    navigation.navigate('EscolherBicicleta', { id_usuario, id_lojista, id_servico: id_tipo_servico });
+    navigation.navigate('EscolherBicicleta', { id_usuario, id_lojista, id_tipo_servico });
   };
 
   const renderItem = ({ item }) => (

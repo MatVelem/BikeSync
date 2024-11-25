@@ -18,14 +18,17 @@ const ConfirmarServicoScreen = ({ route }) => {
         .then(data => setBicicleta(Array.isArray(data) ? data[0] : data))
         .catch(error => console.error('Erro ao carregar bicicleta:', error));
     }
-
+  
     if (id_tipo_servico) {
       fetch(`http://localhost:3000/api/tiposervico/${id_tipo_servico}`)
         .then(response => response.json())
-        .then(data => setServico(data))
+        .then(data => {
+          console.log('Serviço:', data); // Adicione esta linha para verificar os dados do serviço
+          setServico(data);
+        })
         .catch(error => console.error('Erro ao carregar serviço:', error));
     }
-
+  
     if (id_lojista) {
       fetch(`http://localhost:3000/api/lojistas/${id_lojista}`)
         .then(response => response.json())
@@ -33,9 +36,11 @@ const ConfirmarServicoScreen = ({ route }) => {
         .catch(error => console.error('Erro ao carregar loja:', error));
     }
   }, [id_bicicleta, id_tipo_servico, id_lojista]);
+  
 
   const criarOrdemServico = () => {
     setLoading(true);
+    setErro(''); // Limpar erro antes da solicitação
     fetch('http://localhost:3000/api/ordemservico', {
       method: 'POST',
       headers: {
@@ -46,13 +51,18 @@ const ConfirmarServicoScreen = ({ route }) => {
         id_bicicleta,
         id_tipo_servico,
         id_lojista,
-        data: new Date().toISOString().split('T')[0],
+        data: new Date().toISOString().split('T')[0], // Formato de data esperado
         valor: servico ? servico.preco : 0,
         status_pagamento: 'Pendente',
         observacoes,
       }),
     })
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          return response.json().then(err => { throw new Error(err.error || 'Erro ao criar ordem de serviço') });
+        }
+        return response.json();
+      })
       .then(() => {
         setLoading(false);
         setConfirmacao(true);
@@ -63,6 +73,7 @@ const ConfirmarServicoScreen = ({ route }) => {
         console.error('Erro ao criar ordem de serviço:', error);
       });
   };
+  
 
   return (
     <View style={styles.container}>
@@ -92,6 +103,7 @@ const ConfirmarServicoScreen = ({ route }) => {
             <View style={styles.detailContainer}>
               <Text style={styles.detailTitle}>Loja Escolhida:</Text>
               <Text style={styles.detailText}>Nome: {lojista.nome_loja}</Text>
+              <Text style={styles.detailText}>Endereço: {lojista.endereco}</Text>
             </View>
           )}
 

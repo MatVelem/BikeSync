@@ -135,21 +135,6 @@ app.get('/api/bicicletas/:id_usuario', (req, res) => {
   });
 });
 
-// Rota para obter detalhes de uma bicicleta específica
-app.get('/api/bicicletas/:id_bicicleta', (req, res) => {
-  const { id_bicicleta } = req.params;
-
-  const sql = `SELECT b.id_bicicleta, m.nome_marca AS marca, b.modelo, b.ano, b.tamanho_roda, b.serial, b.tipo, b.cor, b.material, b.kit_transmissao, b.tamanho_quadro, b.informacoes_adicionais 
-               FROM Bicicleta b 
-               JOIN Marca m ON b.id_marca = m.id_marca 
-               WHERE b.id_bicicleta = ?`;
-
-  connection.query(sql, [id_bicicleta], (err, results) => {
-    if (err) return res.status(500).json({ error: err });
-    res.json(results[0]);
-  });
-});
-
 // Rota para obter detalhes de um serviço específico
 app.get('/api/tiposervico/:id_tipo_servico', (req, res) => {
   const { id_tipo_servico } = req.params;
@@ -158,22 +143,46 @@ app.get('/api/tiposervico/:id_tipo_servico', (req, res) => {
                FROM TipoServico 
                WHERE id_tipo_servico = ?`;
 
-  connection.query(sql, [id_servico], (err, results) => {
-    if (err) return res.status(500).json({ error: err });
+  connection.query(sql, [id_tipo_servico], (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
     res.json(results[0]);
   });
 });
 
-// Rota para criar uma nova ordem de serviço
+// Endpoint para obter detalhes de um lojista específico
+app.get('/api/lojistas/:id_lojista', (req, res) => {
+  const { id_lojista } = req.params;
+  const sql = 'SELECT * FROM Lojista WHERE id_lojista = ?';
+
+  connection.query(sql, [id_lojista], (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    if (results.length > 0) {
+      res.json(results[0]);
+    } else {
+      res.status(404).json({ message: 'Lojista não encontrado' });
+    }
+  });
+});
+
 app.post('/api/ordemservico', (req, res) => {
   const { id_usuario, id_bicicleta, id_tipo_servico, id_lojista, data, valor, status_pagamento, observacoes } = req.body;
+
+  // Verificação de campos obrigatórios
+  if (!id_usuario || !id_bicicleta || !id_tipo_servico || !id_lojista || !data || !valor || !status_pagamento) {
+    return res.status(400).json({ error: 'Todos os campos obrigatórios devem ser preenchidos' });
+  }
 
   const sql = `INSERT INTO OrdemServico (id_usuario, id_bicicleta, id_tipo_servico, id_lojista, data, valor, status_pagamento, observacoes) 
                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
 
   connection.query(sql, [id_usuario, id_bicicleta, id_tipo_servico, id_lojista, data, valor, status_pagamento, observacoes], (err, result) => {
     if (err) {
-      return res.status(500).json({ error: err });
+      console.error("Erro ao inserir dados: ", err); // Imprimir o erro detalhado no console
+      return res.status(500).json({ error: err.message }); // Retornar a mensagem de erro detalhada
     }
     res.status(200).send({ message: 'Ordem de serviço criada com sucesso!', ordemServicoId: result.insertId });
   });
@@ -297,7 +306,7 @@ app.post('/servicos/lojista/:id_lojista', (req, res) => {
     }
     res.status(200).send({
       message: 'Serviço adicionado com sucesso!',
-      servico: { id_servico: result.insertId, nome_tipo, descricao, preco }
+      servico: { id_tipo_servico: result.insertId, nome_tipo, descricao, preco }
     });
   });
 });

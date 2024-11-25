@@ -3,8 +3,9 @@ import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity }
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 
-const LojasScreen = () => {
-  const navigation = useNavigation(); // Para navegação
+const LojasScreen = ({ route }) => {
+  const navigation = useNavigation();
+  const { id_usuario } = route.params || {}; // Receber id_usuario nas props
   const [lojas, setLojas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -35,9 +36,9 @@ const LojasScreen = () => {
     }
   };
 
-  const handleSelectServico = (id_tipo_servico, id_usuario) => {
-    // Navegar para a tela 'EscolherBicicleta' passando o id_tipo_servico e id_usuario
-    navigation.navigate('EscolherBicicleta', { id_tipo_servico, id_usuario: 1 });
+  const handleSelectServico = (id_tipo_servico, id_lojista) => {
+   
+    navigation.navigate('EscolherBicicleta', { id_usuario, id_lojista, id_servico: id_tipo_servico });
   };
 
   const renderItem = ({ item }) => (
@@ -45,7 +46,7 @@ const LojasScreen = () => {
       style={styles.item}
       onPress={() => {
         setSelectedLoja(item);
-        fetchTiposServicos(item.id_lojista); // Busca os tipos de serviços ao selecionar a loja
+        fetchTiposServicos(item.id_lojista);
       }}
     >
       <Text style={styles.itemText}>Nome: {item.nome_loja}</Text>
@@ -58,10 +59,9 @@ const LojasScreen = () => {
       <Text style={styles.servicoText}>Descrição: {item.descricao}</Text>
       <Text style={styles.servicoText}>Preço: R$ {item.preco}</Text>
 
-      {/* Botão para selecionar o serviço */}
       <TouchableOpacity
         style={styles.selectButton}
-        onPress={() => handleSelectServico(item.id_tipo_servico)}
+        onPress={() => handleSelectServico(item.id_tipo_servico, selectedLoja.id_lojista)}
       >
         <Text style={styles.selectButtonText}>Selecionar</Text>
       </TouchableOpacity>
@@ -98,7 +98,6 @@ const LojasScreen = () => {
   );
 };
 
-// Estilos atualizados
 const styles = StyleSheet.create({
   container: {
     flex: 1,

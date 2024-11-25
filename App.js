@@ -15,7 +15,7 @@ import EscolherBicicletaScreen from './screens/EscolherBicicleta';
 import RelatorioLojista from './screens/RelatorioLojista';
 import ServicosLojista from './screens/ServicosLojista';
 import LojasScreen from './screens/LojasScreen';
-
+import ConfirmarServicoScreen from './screens/ConfirmarServicoScreen';
 const Stack = createStackNavigator();
 
 function MyStack() {
@@ -91,6 +91,12 @@ function MyStack() {
       component={EscolherBicicletaScreen}
       options={{ title:'Agendar serviço'}}
       />
+       <Stack.Screen
+      name="ConfirmarServicoScreen"
+      component={ConfirmarServicoScreen}
+      options={{ title:'Agendar serviço'}}
+      />
+
      <Stack.Screen
       name="LojasScreen"
       component={LojasScreen}

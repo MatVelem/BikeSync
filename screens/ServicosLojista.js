@@ -92,13 +92,13 @@ const ServicosLojista = ({ navigation, route }) => {
         <View style={styles.servicesContainer}>
           {servicos.length > 0 ? (
             servicos.map((item) => (
-              <View key={item.id_servico} style={styles.item}>
+              <View key={item.id_tipo_servico} style={styles.item}>
                 <Text style={styles.itemText}>
                   {item.nome_tipo} - {item.descricao} | Preço: R$ {item.preco}
                 </Text>
                 <TouchableOpacity
                   style={styles.removeButton}
-                  onPress={() => handleRemoveService(item.id_servico)}
+                  onPress={() => handleRemoveService(item.id_tipo_servico)}
                 >
                   <Text style={styles.removeButtonText}>Remover</Text>
                 </TouchableOpacity>

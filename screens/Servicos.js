@@ -6,7 +6,7 @@ const ServicosScreen = ({ route }) => {
   const [servicos, setServicos] = useState([]);
 
   useEffect(() => {
-    fetch(`http://localhost:3000/api/lojas/${idLoja}/servicos`)
+    fetch(`http://localhost:3000/api/lojistas/${idLoja}/servicos`) // Ajustei a rota aqui
       .then((response) => response.json())
       .then((data) => setServicos(data))
       .catch((error) => console.error('Erro ao carregar serviços:', error));
@@ -17,10 +17,10 @@ const ServicosScreen = ({ route }) => {
       <Text style={styles.title}>Serviços da Loja</Text>
       <FlatList
         data={servicos}
-        keyExtractor={(item) => item.id_servico.toString()}
+        keyExtractor={(item) => item.id_tipo_servico.toString()} // Ajustei o keyExtractor para id_tipo_servico
         renderItem={({ item }) => (
           <View style={styles.item}>
-            <Text style={styles.text}>{item.nome}</Text>
+            <Text style={styles.text}>{item.nome_tipo}</Text> // Ajustei para item.nome_tipo
             <Text style={styles.description}>{item.descricao}</Text>
           </View>
         )}

@@ -14,7 +14,7 @@ const connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: 'admin',
-  database: 'BikeSync',
+  database: 'BikeSync3',
 });
 
 connection.connect((err) => {
@@ -33,7 +33,7 @@ app.post('/bicicletas', (req, res) => {
 
   connection.query(sql, [id_marca, modelo, ano, tamanho_roda, serial, tipo, cor, material, kit_transmissao, tamanho_quadro, informacoes_adicionais, id_usuario], (err, result) => {
     if (err) {
-      console.error('Erro ao adicionar bicicleta:', err); // Log do erro
+      console.error('Erro ao adicionar bicicleta:', err);
       return res.status(500).send({ message: 'Erro ao adicionar bicicleta', error: err });
     }
     res.status(200).send({ message: 'Bicicleta adicionada com sucesso!', bicicletaId: result.insertId });
@@ -61,6 +61,28 @@ app.get('/api/lojas', (req, res) => {
   });
 });
 
+
+
+// Endpoint para obter detalhes de um lojista específico
+app.get('/api/lojistas/:id_lojista', (req, res) => {
+  const { id_lojista } = req.params;
+  const sql = 'SELECT * FROM Lojista WHERE id_lojista = ?';
+
+  connection.query(sql, [id_lojista], (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: err });
+    }
+    if (results.length > 0) {
+      res.json(results[0]);
+    } else {
+      res.status(404).json({ message: 'Lojista não encontrado' });
+    }
+  });
+});
+
+
+
+
 // Endpoint para listar tipos de serviços de um lojista específico
 app.get('/api/lojistas/:id_lojista/servicos', (req, res) => {
   const { id_lojista } = req.params;
@@ -83,8 +105,6 @@ app.get('/api/lojistas/:id_lojista/servicos', (req, res) => {
     res.json(results);
   });
 });
-
-
 
 // Rota para obter todas as bicicletas (com JOIN para exibir nome da marca)
 app.get('/api/bicicletas', (req, res) => {
@@ -114,6 +134,51 @@ app.get('/api/bicicletas/:id_usuario', (req, res) => {
     res.json(results);
   });
 });
+
+// Rota para obter detalhes de uma bicicleta específica
+app.get('/api/bicicletas/:id_bicicleta', (req, res) => {
+  const { id_bicicleta } = req.params;
+
+  const sql = `SELECT b.id_bicicleta, m.nome_marca AS marca, b.modelo, b.ano, b.tamanho_roda, b.serial, b.tipo, b.cor, b.material, b.kit_transmissao, b.tamanho_quadro, b.informacoes_adicionais 
+               FROM Bicicleta b 
+               JOIN Marca m ON b.id_marca = m.id_marca 
+               WHERE b.id_bicicleta = ?`;
+
+  connection.query(sql, [id_bicicleta], (err, results) => {
+    if (err) return res.status(500).json({ error: err });
+    res.json(results[0]);
+  });
+});
+
+// Rota para obter detalhes de um serviço específico
+app.get('/api/tiposervico/:id_tipo_servico', (req, res) => {
+  const { id_servico } = req.params;
+
+  const sql = `SELECT id_tipo_servico, nome_tipo, descricao, preco 
+               FROM TipoServico 
+               WHERE id_tipo_servico = ?`;
+
+  connection.query(sql, [id_servico], (err, results) => {
+    if (err) return res.status(500).json({ error: err });
+    res.json(results[0]);
+  });
+});
+
+// Rota para criar uma nova ordem de serviço
+app.post('/api/ordemservico', (req, res) => {
+  const { id_usuario, id_bicicleta, id_tipo_servico, id_lojista, data, valor, status_pagamento, observacoes } = req.body;
+
+  const sql = `INSERT INTO OrdemServico (id_usuario, id_bicicleta, id_tipo_servico, id_lojista, data, valor, status_pagamento, observacoes) 
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+
+  connection.query(sql, [id_usuario, id_bicicleta, id_tipo_servico, id_lojista, data, valor, status_pagamento, observacoes], (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: err });
+    }
+    res.status(200).send({ message: 'Ordem de serviço criada com sucesso!', ordemServicoId: result.insertId });
+  });
+});
+
 
 // Rota para login
 app.post('/login', (req, res) => {
@@ -186,7 +251,6 @@ app.delete('/bicicletas/:id_bicicleta', (req, res) => {
 app.get('/historico/usuario/:idUsuario', (req, res) => {
   const { idUsuario } = req.params;
   
-  // Sua consulta SQL para o histórico do usuário
   let query = `
     SELECT 
       h.id_historico, 
@@ -219,13 +283,13 @@ app.get('/historico/usuario/:idUsuario', (req, res) => {
 // Rota para adicionar serviço para o lojista com preço
 app.post('/servicos/lojista/:id_lojista', (req, res) => {
   const { id_lojista } = req.params;
-  const { nome_tipo, descricao, preco } = req.body;  // Alterado tipo_servico para nome_tipo
+  const { nome_tipo, descricao, preco } = req.body;
 
   if (!nome_tipo || !descricao || !preco || preco <= 0) {
     return res.status(400).send({ message: 'Todos os campos são obrigatórios e o preço deve ser válido.' });
   }
 
-  const sql = 'INSERT INTO TipoServico (lojista_id, nome_tipo, descricao, preco) VALUES (?, ?, ?, ?)';  // Alterado tipo_servico para nome_tipo
+  const sql = 'INSERT INTO TipoServico (lojista_id, nome_tipo, descricao, preco) VALUES (?, ?, ?, ?)';
   connection.query(sql, [id_lojista, nome_tipo, descricao, preco], (err, result) => {
     if (err) {
       console.error("Erro ao adicionar serviço:", err);
@@ -233,18 +297,16 @@ app.post('/servicos/lojista/:id_lojista', (req, res) => {
     }
     res.status(200).send({
       message: 'Serviço adicionado com sucesso!',
-      servico: { id_servico: result.insertId, nome_tipo, descricao, preco }  // Alterado tipo_servico para nome_tipo
+      servico: { id_servico: result.insertId, nome_tipo, descricao, preco }
     });
   });
 });
-
 
 // Rota para remover serviço
 app.delete('/servicos/:id_servico', (req, res) => {
   const { id_servico } = req.params;
 
-  // Query para excluir o serviço pelo id
-  const sql = 'DELETE FROM TipoServico WHERE id_tipo_servico = ?';  // Alterado para refletir a tabela TipoServico
+  const sql = 'DELETE FROM TipoServico WHERE id_tipo_servico = ?';
   connection.query(sql, [id_servico], (err, result) => {
     if (err) {
       console.error("Erro ao remover serviço:", err);
@@ -276,7 +338,6 @@ app.get('/historico/lojista/:idLojista', (req, res) => {
   const { idLojista } = req.params;
   const { data, tipoFiltro } = req.query;
 
-  // Sua consulta SQL para o histórico do lojista
   let query = `
      SELECT Historico.descricao, Historico.data_registro, Bicicleta.modelo, Servicos.tipo, Usuario.nome, Usuario.email, Usuario.telefone, Servicos.descricao_servico
      FROM Historico
@@ -327,7 +388,7 @@ app.get('/relatorios/:id_lojista', async (req, res) => {
       });
     });
 
-    // Calculando o total de serviços
+      // Calculando o total de serviços
     const totalServicos = result.reduce((acc, curr) => acc + curr.quantidade, 0);
 
     // Enviando os dados do relatório e o total de serviços
@@ -340,7 +401,6 @@ app.get('/relatorios/:id_lojista', async (req, res) => {
     res.status(500).json({ error: 'Erro ao carregar dados do relatório' });
   }
 });
-
 
 // Rota para obter o valor total dos serviços prestados por um lojista
 app.get('/valorTotalServicos/:id_lojista', (req, res) => {
@@ -362,9 +422,6 @@ app.get('/valorTotalServicos/:id_lojista', (req, res) => {
     });
   });
 });
-
-
-
 
 const port = 3000; 
 app.listen(port, () => {

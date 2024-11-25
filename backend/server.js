@@ -152,7 +152,7 @@ app.get('/api/bicicletas/:id_bicicleta', (req, res) => {
 
 // Rota para obter detalhes de um serviço específico
 app.get('/api/tiposervico/:id_tipo_servico', (req, res) => {
-  const { id_servico } = req.params;
+  const { id_tipo_servico } = req.params;
 
   const sql = `SELECT id_tipo_servico, nome_tipo, descricao, preco 
                FROM TipoServico 

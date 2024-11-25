@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Image, TextInput } from 'react-native';
 
 const ConfirmarServicoScreen = ({ route }) => {
-  const { id_usuario, id_bicicleta, id_servico, id_lojista } = route.params || {};
+  const { id_usuario, id_bicicleta, id_tipo_servico, id_lojista } = route.params || {};
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState('');
   const [bicicleta, setBicicleta] = useState(null);
@@ -19,8 +19,8 @@ const ConfirmarServicoScreen = ({ route }) => {
         .catch(error => console.error('Erro ao carregar bicicleta:', error));
     }
 
-    if (id_servico) {
-      fetch(`http://localhost:3000/api/tiposervico/${id_servico}`)
+    if (id_tipo_servico) {
+      fetch(`http://localhost:3000/api/tiposervico/${id_tipo_servico}`)
         .then(response => response.json())
         .then(data => setServico(data))
         .catch(error => console.error('Erro ao carregar serviço:', error));
@@ -32,7 +32,7 @@ const ConfirmarServicoScreen = ({ route }) => {
         .then(data => setLojista(data))
         .catch(error => console.error('Erro ao carregar loja:', error));
     }
-  }, [id_bicicleta, id_servico, id_lojista]);
+  }, [id_bicicleta, id_tipo_servico, id_lojista]);
 
   const criarOrdemServico = () => {
     setLoading(true);
@@ -44,7 +44,7 @@ const ConfirmarServicoScreen = ({ route }) => {
       body: JSON.stringify({
         id_usuario,
         id_bicicleta,
-        id_servico,
+        id_tipo_servico,
         id_lojista,
         data: new Date().toISOString().split('T')[0],
         valor: servico ? servico.preco : 0,

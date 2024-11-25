@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, 
 import axios from 'axios';
 
 const EscolherBicicletaScreen = ({ navigation, route }) => {
-  const { id_usuario, id_lojista, id_servico } = route.params || {}; // Adicionei id_lojista
+  const { id_usuario, id_lojista, id_tipo_servico } = route.params || {}; // Adicionei id_lojista
   const [bicicletas, setBicicletas] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -30,7 +30,7 @@ const EscolherBicicletaScreen = ({ navigation, route }) => {
       id_usuario,
       id_bicicleta: bicicleta.id_bicicleta,
       id_lojista, // Passei id_lojista
-      id_servico,
+      id_tipo_servico,
     });
   };
 

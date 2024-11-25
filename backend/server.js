@@ -268,13 +268,14 @@ app.get('/historico/usuario/:idUsuario', (req, res) => {
       b.modelo,
       m.nome_marca,
       h.id_servico,
-      s.tipo, 
+      t.nome_tipo, 
       s.preco,
       l.nome_loja
     FROM Historico h
     INNER JOIN Bicicleta b ON h.id_bicicleta = b.id_bicicleta
     INNER JOIN Marca m ON b.id_marca = m.id_marca
     LEFT JOIN Servicos s ON h.id_servico = s.id_servico
+    INNER JOIN TipoServico t ON s.id_tipo_servico = t.id_tipo_servico
     INNER JOIN Lojista l ON s.id_lojista = l.id_lojista
     WHERE b.id_usuario = ?
     ORDER BY h.data_registro DESC;
@@ -348,9 +349,10 @@ app.get('/historico/lojista/:idLojista', (req, res) => {
   const { data, tipoFiltro } = req.query;
 
   let query = `
-     SELECT Historico.descricao, Historico.data_registro, Bicicleta.modelo, Servicos.tipo, Usuario.nome, Usuario.email, Usuario.telefone, Servicos.descricao_servico
+     SELECT Historico.descricao, Historico.data_registro, Bicicleta.modelo, TipoServico.nome_tipo, Usuario.nome, Usuario.email, Usuario.telefone, TipoServico.descricao
      FROM Historico
      INNER JOIN Servicos ON Historico.id_servico = Servicos.id_servico
+     INNER JOIN TipoServico ON Servicos.id_tipo_servico = TipoServico.id_tipo_servico
      INNER JOIN Bicicleta ON Historico.id_bicicleta = Bicicleta.id_bicicleta
      INNER JOIN Usuario ON Bicicleta.id_usuario = Usuario.id_usuario
      WHERE Servicos.id_lojista = ?

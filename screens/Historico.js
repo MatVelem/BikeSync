@@ -94,7 +94,7 @@ const Historico = ({ navigation, route }) => {
                 <Text style={styles.modalText}>Preço: {selectedService.preco || 'N/A'}</Text>
                 <Text style={styles.modalText}>Modelo: {selectedService.modelo || 'N/A'}</Text>
                 <Text style={styles.modalText}>Marca: {selectedService.nome_marca || 'N/A'}</Text>
-                {/* Nome da loja agora aparece no modal */}
+                <Text style={styles.modalText}>Serviço: {selectedService.nome_tipo || 'N/A'}</Text>
                 <Text style={styles.modalText}>Loja: {selectedService.nome_loja || 'N/A'}</Text>
                 <TouchableOpacity onPress={closeModal} style={styles.buttonClose}>
                   <Text style={styles.buttonCloseText}>Fechar</Text>

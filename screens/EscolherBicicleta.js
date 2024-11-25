@@ -1,85 +1,107 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
-import axios from 'axios'; // Importa o axios
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Image } from 'react-native';
+import axios from 'axios';
 
 const EscolherBicicletaScreen = ({ navigation, route }) => {
-  const { id_usuario, id_servico } = route.params || {}; // Obtém o id_usuario e id_servico da navegação
-  const [bicicletas, setBicicletas] = useState([]); // Estado para armazenar as bicicletas
-  const [loading, setLoading] = useState(true); // Estado para controlar o loading
+  const { id_usuario, id_servico } = route.params || {};
+  const [bicicletas, setBicicletas] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Verifica se id_usuario está disponível antes de fazer a requisição
   useEffect(() => {
     if (id_usuario) {
       axios
         .get(`http://localhost:3000/api/bicicletas/${id_usuario}`)
         .then((response) => {
-          setBicicletas(response.data); // Atualiza o estado com os dados das bicicletas
-          setLoading(false); // Finaliza o loading
+          setBicicletas(response.data);
+          setLoading(false);
         })
         .catch((error) => {
           console.error('Erro ao carregar bicicletas:', error);
-          setLoading(false); // Finaliza o loading mesmo em caso de erro
+          setLoading(false);
         });
     } else {
       console.error('ID de usuário não encontrado');
-      setLoading(false); // Finaliza o loading se id_usuario não for passado
+      setLoading(false);
     }
-  }, [id_usuario]); // Re-executa o useEffect apenas quando id_usuario mudar
+  }, [id_usuario]);
 
-  // Função para selecionar a bicicleta e navegar para a tela de confirmação ou ação do serviço
   const selecionarBicicleta = (bicicleta) => {
-    // Navegar para a próxima tela passando tanto o id_bicicleta quanto o id_servico
     navigation.navigate('LojasScreen', {
       id_usuario,
       id_bicicleta: bicicleta.id_bicicleta,
-      id_servico, // Passando o id_servico para a próxima tela
+      id_servico,
     });
   };
 
-  // Exibe um carregamento enquanto as bicicletas são carregadas
   if (loading) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text style={styles.title}>Carregando bicicletas...</Text>
+        <ActivityIndicator size="large" color="#000" />
+        <Text style={styles.loadingText}>Carregando bicicletas...</Text>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <Image
+          source={require('../assets/bikesyncimagem.png')}
+          style={styles.logo}
+        />
+      </View>
+
       <Text style={styles.title}>Escolha uma Bicicleta</Text>
 
-      {/* Lista de bicicletas */}
       <FlatList
         data={bicicletas}
         keyExtractor={(item) => item.id_bicicleta.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.button}
-            onPress={() => selecionarBicicleta(item)} // Passa a bicicleta selecionada
+            onPress={() => selecionarBicicleta(item)}
           >
             <Text style={styles.buttonText}>{item.modelo}</Text>
           </TouchableOpacity>
         )}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>Nenhuma bicicleta disponível.</Text>
+        }
       />
     </View>
   );
 };
 
-// Estilos para a tela
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF',
+    backgroundColor: '#FFB400',
     padding: 20,
+    justifyContent: 'space-between',
+  },
+  header: {
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 20,
+  },
+  logo: {
+    width: 200,
+    height: 100,
+    resizeMode: 'contain',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: '#000',
+    textAlign: 'center',
     marginBottom: 20,
+  },
+  loadingText: {
+    fontSize: 18,
+    color: '#000',
+    textAlign: 'center',
+    marginTop: 10,
   },
   button: {
     backgroundColor: '#000',
@@ -93,6 +115,12 @@ const styles = StyleSheet.create({
     color: '#FFB400',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  emptyText: {
+    fontSize: 18,
+    color: '#000',
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
 

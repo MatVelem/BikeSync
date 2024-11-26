@@ -158,7 +158,7 @@ app.get('/api/tiposervico/:id_tipo_servico', (req, res) => {
                FROM TipoServico 
                WHERE id_tipo_servico = ?`;
 
-  connection.query(sql, [id_servico], (err, results) => {
+  connection.query(sql, [id_tipo_servico], (err, results) => {
     if (err) return res.status(500).json({ error: err });
     res.json(results[0]);
   });
@@ -305,10 +305,10 @@ app.post('/servicos/lojista/:id_lojista', (req, res) => {
 
 // Rota para remover serviço
 app.delete('/servicos/:id_servico', (req, res) => {
-  const { id_servico } = req.params;
+  const { id_tipo_servico } = req.params;
 
   const sql = 'DELETE FROM TipoServico WHERE id_tipo_servico = ?';
-  connection.query(sql, [id_servico], (err, result) => {
+  connection.query(sql, [id_tipo_servico], (err, result) => {
     if (err) {
       console.error("Erro ao remover serviço:", err);
       return res.status(500).send({ message: 'Erro ao remover serviço', error: err });

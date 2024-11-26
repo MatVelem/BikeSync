@@ -548,7 +548,7 @@ app.get('/api/ordens/rejeitar', (req, res) => {
 
   const updateOrdemQuery = `
       UPDATE OrdemServico 
-      SET status_pagamento = 'Falhou' 
+      SET status = 'Cancelado' 
       WHERE id_ordem_servico = ?;
   `;
 

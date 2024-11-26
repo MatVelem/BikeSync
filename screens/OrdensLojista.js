@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Modal } from 'react-native';
 
 const OrdensLojista = ({ route, navigation }) => {
-    const { id_lojista } = route.params; // Receber id_lojista
+    const { id_lojista } = route.params;
     const [ordens, setOrdens] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [modalVisible, setModalVisible] = useState(false);
-    const [acceptedOrder, setAcceptedOrder] = useState({ id: null, nome: '' });
+    const [acceptedModalVisible, setAcceptedModalVisible] = useState(false);
+    const [rejectionModalVisible, setRejectionModalVisible] = useState(false);
+    const [selectedOrder, setSelectedOrder] = useState({ id: null, nome: '' });
+    const [confirmationModalVisible, setConfirmationModalVisible] = useState(false);
 
     useEffect(() => {
         fetchOrdens();
@@ -34,18 +36,18 @@ const OrdensLojista = ({ route, navigation }) => {
                 },
                 body: JSON.stringify({
                     id_ordem_servico,
-                    preco, // Preço vindo da ordem
-                    data_servico: new Date().toISOString(), // Data atual
-                    id_bicicleta, // ID da bicicleta vindo da ordem
+                    preco,
+                    data_servico: new Date().toISOString(),
+                    id_bicicleta,
                     id_lojista,
-                    id_tipo_servico, // Tipo do serviço vindo da ordem
+                    id_tipo_servico,
                 }),
             });
 
             if (response.status === 200) {
                 fetchOrdens(); // Atualiza a lista de ordens pendentes
-                setAcceptedOrder({ id: id_ordem_servico, nome: usuario_nome });
-                setModalVisible(true);
+                setSelectedOrder({ id: id_ordem_servico, nome: usuario_nome });
+                setAcceptedModalVisible(true);
             } else {
                 setError('Erro ao aceitar ordem');
             }
@@ -54,17 +56,20 @@ const OrdensLojista = ({ route, navigation }) => {
         }
     };
 
-    const rejeitarOrdem = async (id_ordem_servico) => {
+    const rejeitarOrdem = (id_ordem_servico, usuario_nome) => {
+        setSelectedOrder({ id: id_ordem_servico, nome: usuario_nome });
+        setConfirmationModalVisible(true);
+    };
+
+    const confirmarRejeitarOrdem = async () => {
         try {
-            const response = await fetch('http://localhost:3000/api/ordens/rejeitar', {
+            const response = await fetch(`http://localhost:3000/api/ordens/rejeitar?id_ordem_servico=${selectedOrder.id}`, {
                 method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                params: { id_ordem_servico },
             });
             if (response.status === 200) {
                 fetchOrdens(); // Atualiza a lista de ordens pendentes
+                setConfirmationModalVisible(false);
+                setRejectionModalVisible(true);
             } else {
                 setError('Erro ao rejeitar ordem');
             }
@@ -85,10 +90,10 @@ const OrdensLojista = ({ route, navigation }) => {
                     onPress={() =>
                         aceitarOrdem(
                             item.id_ordem_servico,
-                            item.valor, // Preço da ordem
-                            item.id_bicicleta, // ID da bicicleta
-                            item.id_tipo_servico, // ID do tipo de serviço
-                            item.usuario_nome // Nome do usuário
+                            item.valor,
+                            item.id_bicicleta,
+                            item.id_tipo_servico,
+                            item.usuario_nome
                         )
                     }
                 >
@@ -96,7 +101,7 @@ const OrdensLojista = ({ route, navigation }) => {
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.rejeitarButton}
-                    onPress={() => rejeitarOrdem(item.id_ordem_servico)}
+                    onPress={() => rejeitarOrdem(item.id_ordem_servico, item.usuario_nome)}
                 >
                     <Text style={styles.buttonText}>Rejeitar</Text>
                 </TouchableOpacity>
@@ -120,20 +125,61 @@ const OrdensLojista = ({ route, navigation }) => {
                 keyExtractor={(item) => item.id_ordem_servico.toString()}
             />
 
-            {/* Modal de Confirmação */}
+            {/* Modal de Confirmação de Aceitação */}
             <Modal
                 transparent={true}
-                visible={modalVisible}
+                visible={acceptedModalVisible}
                 animationType="slide"
-                onRequestClose={() => setModalVisible(false)}
+                onRequestClose={() => setAcceptedModalVisible(false)}
             >
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContainer}>
                         <Text style={styles.modalTitle}>Pedido Aceito</Text>
-                        <Text style={styles.modalMessage}>O pedido de ID {acceptedOrder.id} do usuário {acceptedOrder.nome} foi aceito com sucesso.</Text>
-                        <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
+                        <Text style={styles.modalMessage}>O pedido de ID {selectedOrder.id} do usuário {selectedOrder.nome} foi aceito com sucesso.</Text>
+                        <TouchableOpacity onPress={() => setAcceptedModalVisible(false)} style={styles.closeButton}>
                             <Text style={styles.closeButtonText}>Fechar</Text>
                         </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* Modal de Confirmação de Rejeição */}
+            <Modal
+                transparent={true}
+                visible={rejectionModalVisible}
+                animationType="slide"
+                onRequestClose={() => setRejectionModalVisible(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContainer}>
+                        <Text style={styles.modalTitle}>Pedido Rejeitado</Text>
+                        <Text style={styles.modalMessage}>O pedido de ID {selectedOrder.id} do usuário {selectedOrder.nome} foi cancelado com sucesso.</Text>
+                        <TouchableOpacity onPress={() => setRejectionModalVisible(false)} style={styles.closeButton}>
+                            <Text style={styles.closeButtonText}>Fechar</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* Modal de Confirmação */}
+            <Modal
+                transparent={true}
+                visible={confirmationModalVisible}
+                animationType="slide"
+                onRequestClose={() => setConfirmationModalVisible(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContainer}>
+                        <Text style={styles.modalTitle}>Confirmar Rejeição</Text>
+                        <Text style={styles.modalMessage}>Tem certeza que quer rejeitar o pedido de ID {selectedOrder.id} do usuário {selectedOrder.nome}?</Text>
+                        <View style={styles.buttonContainer}>
+                            <TouchableOpacity onPress={confirmarRejeitarOrdem} style={styles.confirmButton}>
+                                <Text style={styles.buttonText}>Sim</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => setConfirmationModalVisible(false)} style={styles.cancelButton}>
+                                <Text style={styles.buttonText}>Não</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
             </Modal>
@@ -214,6 +260,19 @@ const styles = StyleSheet.create({
     closeButtonText: {
         color: '#fff',
         fontSize: 16,
+    },
+    confirmButton: {
+        backgroundColor: '#007BFF',
+        padding: 10,
+        borderRadius: 5,
+        marginRight: 10,
+        alignItems: 'center',
+    },
+    cancelButton: {
+        backgroundColor: '#FF0000',
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
     },
 });
 

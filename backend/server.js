@@ -673,20 +673,25 @@ app.get('/api/ordens/:id_ordem_servico', async (req, res) => {
 });
 
 app.get('/api/servicos/pendentes', (req, res) => {
+  const id_lojista = req.query.id_lojista;
+
+  if (!id_lojista) {
+    return res.status(400).json({ message: 'ID do lojista é necessário.' });
+  }
+
   try {
     // 1. Defina a consulta SQL para buscar os serviços pendentes
     const query = `
       SELECT s.id_servico, s.preco, s.data_servico, s.status, s.id_bicicleta, s.id_lojista, s.id_tipo_servico, 
-         b.modelo AS modelo_bicicleta, l.nome_loja AS nome_lojista, t.descricao AS tipo_servico
-  FROM Servicos s
-  INNER JOIN Bicicleta b ON s.id_bicicleta = b.id_bicicleta
-  INNER JOIN Lojista l ON s.id_lojista = l.id_lojista
-  INNER JOIN TipoServico t ON s.id_tipo_servico = t.id_tipo_servico
-  WHERE s.status = 'Pendente'
-    `;
+             b.modelo AS modelo_bicicleta, l.nome_loja AS nome_lojista, t.descricao AS tipo_servico
+      FROM Servicos s
+      INNER JOIN Bicicleta b ON s.id_bicicleta = b.id_bicicleta
+      INNER JOIN Lojista l ON s.id_lojista = l.id_lojista
+      INNER JOIN TipoServico t ON s.id_tipo_servico = t.id_tipo_servico
+      WHERE s.status = 'Pendente' AND s.id_lojista = ?`;
 
     // 2. Execute a consulta para buscar os serviços pendentes
-    connection.query(query, (err, results) => {
+    connection.query(query, [id_lojista], (err, results) => {
       if (err) {
         console.error('Erro ao buscar serviços pendentes:', err);
         return res.status(500).json({ message: 'Erro ao buscar serviços pendentes.' });
@@ -704,6 +709,7 @@ app.get('/api/servicos/pendentes', (req, res) => {
     res.status(500).json({ message: 'Erro interno do servidor.' });
   }
 });
+
 
 app.post('/api/servicos/concluir', (req, res) => {
   const { id_servico } = req.body;

@@ -38,19 +38,19 @@ const Lojista = ({ navigation, route }) => {
         style={styles.addButton}
         onPress={() => navigation.navigate('ServiçosLojista', { id_lojista: route.params.id_lojista })}
       >
-        <Text style={styles.addButtonText}>Serviços</Text>
+        <Text style={styles.addButtonText}>Editar Serviços da loja</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => navigation.navigate('OrdensLojista', { id_lojista: route.params.id_lojista })}
       >
-        <Text style={styles.addButtonText}>Ver ordens</Text>
+        <Text style={styles.addButtonText}>Solicitações de Serviço</Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={styles.addButton}
+        style={styles.addButton2}
         onPress={() => navigation.navigate('OrdensAceitas', { id_lojista: route.params.id_lojista })}
       >
-        <Text style={styles.addButtonText}>Ordens aceitas</Text>
+        <Text style={styles.addButtonText}>Serviços em andamento</Text>
       </TouchableOpacity>
     </View>
   );
@@ -128,6 +128,13 @@ const styles = StyleSheet.create({
   },
   addButton: {
     backgroundColor: '#D32F2F',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginBottom: 20,
+  },addButton2: {
+    backgroundColor: '#008000',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,

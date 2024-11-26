@@ -480,7 +480,7 @@ app.post('/api/servicos/aceitar', async (req, res) => {
                   }
 
                   // 4. Atualize o status da ordem de serviço (opcional)
-                  connection.query('UPDATE OrdemServico SET status_pagamento = ? WHERE id_ordem_servico = ?', ['Pendente', id_ordem_servico], (err) => {
+                  connection.query('UPDATE OrdemServico SET status = ? WHERE id_ordem_servico = ?', ['Aceito', id_ordem_servico], (err) => {
                       if (err) {
                           console.error('Erro ao atualizar ordem de serviço:', err);
                           return res.status(500).json({ message: 'Erro ao atualizar status da ordem de serviço.' });
@@ -607,6 +607,7 @@ app.get('/api/ordens/pendentes/:id_lojista', async (req, res) => {
           WHERE 
               os.id_lojista = ? 
               AND os.status_pagamento = 'Pendente'
+              AND os.status = 'Pendente'
           ORDER BY 
               os.data DESC
       `;

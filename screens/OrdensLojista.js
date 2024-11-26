@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
-import axios from 'axios';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Modal } from 'react-native';
 
 const OrdensLojista = ({ route, navigation }) => {
     const { id_lojista } = route.params; // Receber id_lojista
     const [ordens, setOrdens] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [acceptedOrder, setAcceptedOrder] = useState({ id: null, nome: '' });
 
     useEffect(() => {
         fetchOrdens();
@@ -14,8 +15,9 @@ const OrdensLojista = ({ route, navigation }) => {
 
     const fetchOrdens = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/api/ordens/pendentes/${id_lojista}`);
-            setOrdens(response.data);
+            const response = await fetch(`http://localhost:3000/api/ordens/pendentes/${id_lojista}`);
+            const data = await response.json();
+            setOrdens(data);
         } catch (err) {
             setError('Erro ao carregar ordens');
         } finally {
@@ -23,19 +25,27 @@ const OrdensLojista = ({ route, navigation }) => {
         }
     };
 
-    const aceitarOrdem = async (id_ordem_servico, preco, id_bicicleta, id_tipo_servico) => {
+    const aceitarOrdem = async (id_ordem_servico, preco, id_bicicleta, id_tipo_servico, usuario_nome) => {
         try {
-            const response = await axios.post(`http://localhost:3000/api/servicos/aceitar`, {
-                id_ordem_servico,
-                preco, // Preço vindo da ordem
-                data_servico: new Date().toISOString(), // Data atual
-                id_bicicleta, // ID da bicicleta vindo da ordem
-                id_lojista,
-                id_tipo_servico, // Tipo do serviço vindo da ordem
+            const response = await fetch('http://localhost:3000/api/servicos/aceitar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id_ordem_servico,
+                    preco, // Preço vindo da ordem
+                    data_servico: new Date().toISOString(), // Data atual
+                    id_bicicleta, // ID da bicicleta vindo da ordem
+                    id_lojista,
+                    id_tipo_servico, // Tipo do serviço vindo da ordem
+                }),
             });
 
             if (response.status === 200) {
                 fetchOrdens(); // Atualiza a lista de ordens pendentes
+                setAcceptedOrder({ id: id_ordem_servico, nome: usuario_nome });
+                setModalVisible(true);
             } else {
                 setError('Erro ao aceitar ordem');
             }
@@ -46,7 +56,11 @@ const OrdensLojista = ({ route, navigation }) => {
 
     const rejeitarOrdem = async (id_ordem_servico) => {
         try {
-            const response = await axios.get(`http://localhost:3000/api/ordens/rejeitar`, {
+            const response = await fetch('http://localhost:3000/api/ordens/rejeitar', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 params: { id_ordem_servico },
             });
             if (response.status === 200) {
@@ -73,7 +87,8 @@ const OrdensLojista = ({ route, navigation }) => {
                             item.id_ordem_servico,
                             item.valor, // Preço da ordem
                             item.id_bicicleta, // ID da bicicleta
-                            item.id_tipo_servico // ID do tipo de serviço
+                            item.id_tipo_servico, // ID do tipo de serviço
+                            item.usuario_nome // Nome do usuário
                         )
                     }
                 >
@@ -104,6 +119,24 @@ const OrdensLojista = ({ route, navigation }) => {
                 renderItem={renderOrdem}
                 keyExtractor={(item) => item.id_ordem_servico.toString()}
             />
+
+            {/* Modal de Confirmação */}
+            <Modal
+                transparent={true}
+                visible={modalVisible}
+                animationType="slide"
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContainer}>
+                        <Text style={styles.modalTitle}>Pedido Aceito</Text>
+                        <Text style={styles.modalMessage}>O pedido de ID {acceptedOrder.id} do usuário {acceptedOrder.nome} foi aceito com sucesso.</Text>
+                        <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
+                            <Text style={styles.closeButtonText}>Fechar</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 };
@@ -151,6 +184,36 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginTop: 10,
+    },
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    modalContainer: {
+        backgroundColor: '#fff',
+        padding: 20,
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    modalMessage: {
+        fontSize: 16,
+        marginBottom: 20,
+    },
+    closeButton: {
+        backgroundColor: '#007BFF',
+        padding: 10,
+        borderRadius: 5,
+    },
+    closeButtonText: {
+        color: '#fff',
+        fontSize: 16,
     },
 });
 

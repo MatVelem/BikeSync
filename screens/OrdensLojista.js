@@ -84,6 +84,8 @@ const OrdensLojista = ({ route, navigation }) => {
             <Text style={styles.ordemText}>Bicicleta: {item.bicicleta_nome}</Text>
             <Text style={styles.ordemText}>Usuário: {item.usuario_nome}</Text>
             <Text style={styles.ordemText}>Valor: R$ {item.valor}</Text>
+            <Text style={styles.ordemText}>Tipo: {item.nome_tipo}</Text>
+            <Text style={styles.ordemText}>Descrição: {item.descricao}</Text>
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
                     style={styles.aceitarButton}

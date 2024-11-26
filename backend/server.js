@@ -600,7 +600,8 @@ app.get('/api/ordens/pendentes/:id_lojista', async (req, res) => {
               os.observacoes,
               b.modelo AS bicicleta_nome,
               u.nome AS usuario_nome,
-              ts.descricao AS tipo_servico
+              ts.descricao,
+              ts.nome_tipo
           FROM 
               OrdemServico os
           INNER JOIN 

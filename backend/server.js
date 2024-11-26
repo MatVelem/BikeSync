@@ -672,6 +672,94 @@ app.get('/api/ordens/:id_ordem_servico', async (req, res) => {
   }
 });
 
+app.get('/api/servicos/pendentes', (req, res) => {
+  try {
+    // 1. Defina a consulta SQL para buscar os serviços pendentes
+    const query = `
+      SELECT s.id_servico, s.preco, s.data_servico, s.status, s.id_bicicleta, s.id_lojista, s.id_tipo_servico, 
+         b.modelo AS modelo_bicicleta, l.nome_loja AS nome_lojista, t.descricao AS tipo_servico
+  FROM Servicos s
+  INNER JOIN Bicicleta b ON s.id_bicicleta = b.id_bicicleta
+  INNER JOIN Lojista l ON s.id_lojista = l.id_lojista
+  INNER JOIN TipoServico t ON s.id_tipo_servico = t.id_tipo_servico
+  WHERE s.status = 'Pendente'
+    `;
+
+    // 2. Execute a consulta para buscar os serviços pendentes
+    connection.query(query, (err, results) => {
+      if (err) {
+        console.error('Erro ao buscar serviços pendentes:', err);
+        return res.status(500).json({ message: 'Erro ao buscar serviços pendentes.' });
+      }
+
+      if (results.length === 0) {
+        return res.status(404).json({ message: 'Nenhum serviço pendente encontrado.' });
+      }
+
+      // 3. Retorne os resultados
+      res.status(200).json(results);
+    });
+  } catch (err) {
+    console.error('Erro ao processar a requisição:', err);
+    res.status(500).json({ message: 'Erro interno do servidor.' });
+  }
+});
+
+app.post('/api/servicos/concluir', (req, res) => {
+  const { id_servico } = req.body;
+
+  if (!id_servico) {
+    return res.status(400).json({ message: 'ID do serviço é obrigatório.' });
+  }
+
+  console.log('ID do serviço recebido:', id_servico);
+
+  const queryUpdateServico = `
+    UPDATE Servicos
+    SET status = 'Concluido'
+    WHERE id_servico = ?
+  `;
+
+  const queryInsertHistorico = `
+    INSERT INTO Historico (descricao, data_registro, id_bicicleta, id_servico)
+    SELECT 
+      CONCAT('Serviço concluído: ', t.descricao, ' para a bicicleta ', b.modelo) AS descricao,
+      DATE_FORMAT(NOW(), '%Y-%m-%d') AS data_registro,
+      s.id_bicicleta,
+      s.id_servico
+    FROM Servicos s
+    INNER JOIN TipoServico t ON s.id_tipo_servico = t.id_tipo_servico
+    INNER JOIN Bicicleta b ON s.id_bicicleta = b.id_bicicleta
+    WHERE s.id_servico = ?
+  `;
+
+  connection.query(queryUpdateServico, [id_servico], (err, results) => {
+    if (err) {
+      console.error('Erro ao atualizar status do serviço:', err);
+      return res.status(500).json({ message: 'Erro ao concluir o serviço.' });
+    }
+
+    console.log('Status do serviço atualizado com sucesso:', results);
+
+    connection.query(queryInsertHistorico, [id_servico], (err, results) => {
+      if (err) {
+        console.error('Erro ao inserir no histórico:', err);
+        return res.status(500).json({ message: 'Erro ao registrar no histórico.' });
+      }
+
+      console.log('Dados inseridos no histórico:', results);
+
+      if (results.affectedRows > 0) {
+        return res.status(200).json({ message: 'Serviço concluído e registrado no histórico com sucesso.' });
+      } else {
+        console.warn('Nenhum registro foi adicionado ao histórico.');
+        return res.status(400).json({ message: 'Falha ao registrar no histórico. Verifique os dados.' });
+      }
+    });
+  });
+});
+
+
 
 const port = 3000; 
 app.listen(port, () => {

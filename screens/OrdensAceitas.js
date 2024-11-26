@@ -1,44 +1,37 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Button, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, Button, Alert } from 'react-native';
 import axios from 'axios';
 
-const OrdensAceitas = ({ route, navigation }) => {
-    const { id_ordem_servico } = route.params; // Receber o ID da ordem de serviço
-    const [ordem, setOrdem] = useState(null);
+const OrdensAceitas = () => {
+    const [servicosPendentes, setServicosPendentes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        fetchOrdem();
+        fetchServicosPendentes();
     }, []);
 
-    const fetchOrdem = async () => {
+    const fetchServicosPendentes = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/api/ordens/${id_ordem_servico}`);
-            setOrdem(response.data);
+            const response = await axios.get('http://localhost:3000/api/servicos/pendentes');
+            setServicosPendentes(response.data);
         } catch (err) {
-            setError('Erro ao carregar os detalhes da ordem');
+            setError('Erro ao carregar os serviços pendentes');
         } finally {
             setLoading(false);
         }
     };
 
-    const aceitarOrdem = async () => {
+    const concluirServico = async (id_servico) => {
         try {
-            const response = await axios.post('http://localhost:3000/api/ordens/aceitar', {
-                id_ordem_servico: ordem.id_ordem_servico,
-                preco: ordem.valor, // Passa o valor da ordem
-                data_servico: new Date().toISOString().split('T')[0],
-                id_bicicleta: ordem.id_bicicleta,
-                id_lojista: ordem.id_lojista,
-                id_tipo_servico: ordem.id_tipo_servico,
-            });
-
-            Alert.alert('Sucesso', 'Ordem aceita com sucesso!');
-            navigation.navigate('OrdensAceitas'); // Redireciona para a próxima tela
+            console.log('ID do serviço:', id_servico);
+            const response = await axios.post('http://localhost:3000/api/servicos/concluir', { id_servico });
+            Alert.alert('Sucesso', response.data.message);
+            // Atualiza a lista de serviços pendentes após concluir
+            fetchServicosPendentes();
         } catch (error) {
-            console.error(error);
-            Alert.alert('Erro', 'Erro ao aceitar a ordem.');
+            console.error('Erro ao concluir serviço:', error);
+            Alert.alert('Erro', 'Não foi possível concluir o serviço.');
         }
     };
 
@@ -50,18 +43,32 @@ const OrdensAceitas = ({ route, navigation }) => {
         return <Text style={styles.errorText}>{error}</Text>;
     }
 
-    if (!ordem) {
-        return <Text style={styles.errorText}>Nenhuma informação encontrada.</Text>;
-    }
-
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Detalhes da Ordem #{id_ordem_servico}</Text>
-            <Text>Data: {ordem.data}</Text>
-            <Text>Valor: R$ {ordem.valor}</Text>
-            <Text>Forma de Pagamento: {ordem.forma_pagamento}</Text>
-            <Text>Observações: {ordem.observacoes}</Text>
-            <Button title="Aceitar Ordem" onPress={aceitarOrdem} />
+            <Text style={styles.title}>Ordens Aceitas - Pendentes</Text>
+            {servicosPendentes.length > 0 ? (
+                <FlatList
+                    data={servicosPendentes}
+                    keyExtractor={(item) => item.id_servico.toString()}
+                    renderItem={({ item }) => (
+                        <View style={styles.card}>
+                            <Text>ID Serviço: {item.id_servico}</Text>
+                            <Text>Modelo Bicicleta: {item.modelo_bicicleta}</Text>
+                            <Text>Nome Lojista: {item.nome_lojista}</Text>
+                            <Text>Tipo Serviço: {item.tipo_servico}</Text>
+                            <Text>Preço: R$ {item.preco}</Text>
+                            <Text>Data do Serviço: {item.data_servico}</Text>
+                            <Button
+                                title="Concluir"
+                                color="#28a745"
+                                onPress={() => concluirServico(item.id_servico)}
+                            />
+                        </View>
+                    )}
+                />
+            ) : (
+                <Text style={styles.noOrders}>Nenhuma ordem pendente.</Text>
+            )}
         </View>
     );
 };
@@ -77,8 +84,19 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 10,
     },
+    card: {
+        marginBottom: 15,
+        padding: 10,
+        borderWidth: 1,
+        borderRadius: 5,
+        borderColor: '#ccc',
+    },
     errorText: {
         color: 'red',
+        textAlign: 'center',
+        marginTop: 20,
+    },
+    noOrders: {
         textAlign: 'center',
         marginTop: 20,
     },

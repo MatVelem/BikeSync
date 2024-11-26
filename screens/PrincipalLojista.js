@@ -46,6 +46,12 @@ const Lojista = ({ navigation, route }) => {
       >
         <Text style={styles.addButtonText}>Ver ordens</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => navigation.navigate('OrdensAceitas', { id_lojista: route.params.id_lojista })}
+      >
+        <Text style={styles.addButtonText}>Ordens aceitas</Text>
+      </TouchableOpacity>
     </View>
   );
 };

@@ -377,26 +377,24 @@ app.get('/relatorios/:id_lojista', async (req, res) => {
   try {
     const result = await new Promise((resolve, reject) => {
       connection.query(`
-        SELECT tipo AS name, COUNT(*) AS quantidade 
+        SELECT id_tipo_servico AS name, COUNT(*) AS quantidade 
         FROM Servicos 
         WHERE id_lojista = ? 
-        GROUP BY tipo
+        GROUP BY id_tipo_servico
       `, [id_lojista], (err, results) => {
         if (err) {
-          reject(err);  // Rejeita a Promise se houver erro
+          reject(err);
         } else {
-          resolve(results);  // Resolve com os resultados
+          resolve(results);
         }
       });
     });
 
-      // Calculando o total de serviços
     const totalServicos = result.reduce((acc, curr) => acc + curr.quantidade, 0);
 
-    // Enviando os dados do relatório e o total de serviços
     res.json({
       data: result,
-      totalServicos,  // Incluindo o total de serviços no retorno
+      totalServicos,
     });
   } catch (error) {
     console.error('Erro ao carregar dados do relatório:', error);
@@ -404,14 +402,16 @@ app.get('/relatorios/:id_lojista', async (req, res) => {
   }
 });
 
+
 // Rota para obter o valor total dos serviços prestados por um lojista
 app.get('/valorTotalServicos/:id_lojista', (req, res) => {
   const { id_lojista } = req.params;
   
   const query = `
-    SELECT SUM(preco) AS valorTotal 
+    SELECT id_tipo_servico, SUM(preco) AS valorTotal 
     FROM Servicos 
     WHERE id_lojista = ?
+    GROUP BY id_tipo_servico
   `;
   
   connection.query(query, [id_lojista], (err, results) => {
@@ -419,8 +419,13 @@ app.get('/valorTotalServicos/:id_lojista', (req, res) => {
       console.error('Erro ao calcular o valor total dos serviços:', err);
       return res.status(500).send({ error: 'Erro ao calcular o valor total dos serviços' });
     }
+    
+    // Mapear os resultados para incluir o total geral
+    const totalGeral = results.reduce((acc, curr) => acc + curr.valorTotal, 0);
+
     res.json({
-      valorTotal: results[0].valorTotal || 0, // Retorna 0 se o valor total for nulo
+      data: results,
+      totalGeral,
     });
   });
 });

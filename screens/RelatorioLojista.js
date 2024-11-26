@@ -5,10 +5,10 @@ import { Dimensions } from 'react-native';
 
 const RelatorioLojista = ({ route, navigation }) => {
   const [relatorio, setRelatorio] = useState(null);
-  const [valorTotal, setValorTotal] = useState(null);  // Novo estado para o valor total
+  const [valorTotal, setValorTotal] = useState(null);
   const [selectedService, setSelectedService] = useState(null);
-  const [isGraphModalVisible, setIsGraphModalVisible] = useState(false); // Controle do modal do gráfico
-  const [isValueModalVisible, setIsValueModalVisible] = useState(false); // Controle do modal do valor
+  const [isGraphModalVisible, setIsGraphModalVisible] = useState(false);
+  const [isValueModalVisible, setIsValueModalVisible] = useState(false);
   const { id_lojista } = route.params;
 
   const colorMapping = {
@@ -37,7 +37,10 @@ const RelatorioLojista = ({ route, navigation }) => {
   useEffect(() => {
     fetch(`http://localhost:3000/valorTotalServicos/${id_lojista}`)
       .then((response) => response.json())
-      .then((json) => setValorTotal(json.valorTotal || 0))
+      .then((json) => {
+        const totalGeral = json.totalGeral || 0;
+        setValorTotal(totalGeral);  // Use o totalGeral retornado pelo backend
+      })
       .catch((error) => console.error(error));
   }, [id_lojista]);
 
@@ -47,12 +50,11 @@ const RelatorioLojista = ({ route, navigation }) => {
     setSelectedService(entry);
   };
 
-  // Função para ajustar o tamanho da fonte para serviços específicos
   const getLegendFontSize = (serviceName) => {
     if (serviceName === "Revisão Completa") return 20;
     if (serviceName === "Troca de Pneus") return 20;
     if (serviceName === "Revisão de Freios") return 20;
-    return 15; // Fonte padrão
+    return 15;
   };
 
   return (
@@ -63,12 +65,11 @@ const RelatorioLojista = ({ route, navigation }) => {
 
         <TouchableOpacity 
           style={styles.button} 
-          onPress={() => setIsValueModalVisible(true)} // Abre o modal do valor
+          onPress={() => setIsValueModalVisible(true)}
         >
           <Text style={styles.buttonText}>Ver Valor Total</Text>
         </TouchableOpacity>
 
-        {/* Modal do valor total */}
         <Modal
           animationType="slide"
           transparent={true}
@@ -81,7 +82,7 @@ const RelatorioLojista = ({ route, navigation }) => {
               <Text style={styles.modalText}>R$ {valorTotal}</Text>
               <TouchableOpacity 
                 style={styles.button} 
-                onPress={() => setIsValueModalVisible(false)} // Fecha o modal do valor
+                onPress={() => setIsValueModalVisible(false)}
               >
                 <Text style={styles.buttonText}>Fechar</Text>
               </TouchableOpacity>
@@ -91,12 +92,11 @@ const RelatorioLojista = ({ route, navigation }) => {
 
         <TouchableOpacity 
           style={styles.button} 
-          onPress={() => setIsGraphModalVisible(true)} // Abre o modal do gráfico
+          onPress={() => setIsGraphModalVisible(true)}
         >
           <Text style={styles.buttonText}>Serviços Realizados</Text>
         </TouchableOpacity>
 
-        {/* Modal do gráfico */}
         <Modal
           animationType="slide"
           transparent={true}
@@ -106,19 +106,16 @@ const RelatorioLojista = ({ route, navigation }) => {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Gráfico de Serviços</Text>
-              <Text style={styles.modalText}>Total de Serviços: {relatorio.totalServicos}</Text> {/* Número de serviços dentro do modal do gráfico */}
-
-              <Text style={styles.graphTitle}>Tipo de serviços mais realizados</Text> {/* Título acima do gráfico */}
-
-              {/* Alinhando o gráfico no centro */}
+              <Text style={styles.modalText}>Total de Serviços: {relatorio.totalServicos}</Text>
+              <Text style={styles.graphTitle}>Tipo de serviços mais realizados</Text>
               <View style={styles.chartContainer}>
                 <PieChart
                   data={relatorio.chartData.map(item => ({
                     name: item.name,
                     population: item.quantidade,
                     color: selectedService?.name === item.name ? '#FFD700' : item.color,
-                    legendFontColor: "#000", // Fonte preta na legenda
-                    legendFontSize: getLegendFontSize(item.name), // Ajustando o tamanho da fonte da legenda
+                    legendFontColor: "#000",
+                    legendFontSize: getLegendFontSize(item.name),
                   }))}
                   width={Dimensions.get('window').width - 40}
                   height={220}
@@ -138,7 +135,7 @@ const RelatorioLojista = ({ route, navigation }) => {
 
               {selectedService && (
                 <View style={styles.selectedServiceInfo}>
-                  <Text style={[styles.selectedServiceText, { color: '#000' }]}> {/* Mudando a cor da fonte para preta */}
+                  <Text style={[styles.selectedServiceText, { color: '#000' }]}>
                     Serviço: {selectedService.name}
                   </Text>
                   <Text style={[styles.selectedServiceText, { color: '#000' }]}>
@@ -149,7 +146,7 @@ const RelatorioLojista = ({ route, navigation }) => {
 
               <TouchableOpacity 
                 style={styles.button} 
-                onPress={() => setIsGraphModalVisible(false)} // Fecha o modal do gráfico
+                onPress={() => setIsGraphModalVisible(false)}
               >
                 <Text style={styles.buttonText}>Fechar</Text>
               </TouchableOpacity>
@@ -231,11 +228,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000',
     marginVertical: 10,
-    textAlign: 'center', // Alinhando o título ao centro
+    textAlign: 'center',
   },
   chartContainer: {
-    alignItems: 'center', // Alinha o gráfico no centro
-    marginVertical: 20, // Espaço ao redor do gráfico
+    alignItems: 'center',
+    marginVertical: 20,
   },
   selectedServiceInfo: {
     backgroundColor: '#fff',

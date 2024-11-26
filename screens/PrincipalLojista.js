@@ -28,12 +28,7 @@ const Lojista = ({ navigation, route }) => {
             <Text style={styles.buttonText}>HISTÓRICO</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.button, styles.smallButton, styles.dangerButton]}
-            onPress={() => navigation.navigate('RelatorioLojista', { id_lojista })}
-          >
-            <Text style={styles.buttonText}>Relatórios</Text>
-          </TouchableOpacity>
+          
         </View>
 
         <View style={styles.row}>

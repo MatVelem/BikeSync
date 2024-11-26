@@ -16,6 +16,8 @@ import RelatorioLojista from './screens/RelatorioLojista';
 import ServicosLojista from './screens/ServicosLojista';
 import LojasScreen from './screens/LojasScreen';
 import ConfirmarServicoScreen from './screens/ConfirmarServicoScreen';
+import OrdensLojista from './screens/OrdensLojista';
+import OrdensAceitas from './screens/OrdensAceitas';
 const Stack = createStackNavigator();
 
 function MyStack() {
@@ -101,6 +103,17 @@ function MyStack() {
       name="LojasScreen"
       component={LojasScreen}
       options={{ title:'Agendar serviço'}}
+      />
+      <Stack.Screen
+      name="OrdensLojista"
+      component={OrdensLojista}
+      options={{ title:'Ver pendências'}}
+      />
+      <Stack.Screen
+      name="OrdensAceitas"
+      component={OrdensAceitas}
+      options={{ title:'Ver pendências'}}
+      
       />
     </Stack.Navigator>
   );

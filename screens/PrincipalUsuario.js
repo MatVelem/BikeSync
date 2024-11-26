@@ -28,45 +28,51 @@ const PrincipalUsuario = ({ navigation, route }) => {
         <Text style={styles.userName}>{nome}</Text>
       </View>
 
-      {/* Botão para exibir Minhas Bicicletas */}
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate('MinhasBicicletas', { id_usuario })} // Passa o id_usuario para a tela de Minhas Bicicletas
-      >
-        <Text style={styles.buttonText}>VER MINHAS BICICLETAS</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <View style={styles.row}>
+          {/* Botão para exibir Minhas Bicicletas */}
+          <TouchableOpacity
+            style={[styles.button, styles.smallButton, styles.primaryButton]}
+            onPress={() => navigation.navigate('MinhasBicicletas', { id_usuario })} // Passa o id_usuario para a tela de Minhas Bicicletas
+          >
+            <Text style={styles.buttonText}>MINHAS BICICLETAS</Text>
+          </TouchableOpacity>
 
-      {/* Botão "Adicionar Nova Bicicleta" */}
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => navigation.navigate('AdicionarBicicleta', { id_usuario })} // Passa o id_usuario para a tela de Adicionar Bicicleta
-      >
-        <Text style={styles.addButtonText}>ADICIONAR NOVA BICICLETA +</Text>
-      </TouchableOpacity>
+          {/* Botão "Adicionar Nova Bicicleta" */}
+          <TouchableOpacity
+            style={[styles.button, styles.smallButton, styles.dangerButton]}
+            onPress={() => navigation.navigate('AdicionarBicicleta', { id_usuario })} // Passa o id_usuario para a tela de Adicionar Bicicleta
+          >
+            <Text style={styles.buttonText}>NOVA BICICLETA +</Text>
+          </TouchableOpacity>
+        </View>
 
-      {/* Botão para exibir Lojas */}
-      <TouchableOpacity
-        style={styles.lojasButton}
-        onPress={() => navigation.navigate('Lojas')} // Navega para a tela de Lojas
-      >
-        <Text style={styles.lojasButtonText}>VER LOJAS</Text>
-      </TouchableOpacity>
+        <View style={styles.row}>
+          {/* Botão para exibir Lojas */}
+          <TouchableOpacity
+            style={[styles.button, styles.smallButton, styles.infoButton]}
+            onPress={() => navigation.navigate('Lojas')} // Navega para a tela de Lojas
+          >
+            <Text style={styles.buttonText}>VER LOJAS</Text>
+          </TouchableOpacity>
 
-      {/* Botão para exibir Histórico */}
-      <TouchableOpacity
-        style={styles.historicoButton}
-        onPress={() => navigation.navigate('Historico', { id_usuario })} // Passa o id_usuario para a tela de Histórico
-      >
-        <Text style={styles.historicoButtonText}>VER HISTÓRICO</Text>
-      </TouchableOpacity>
+          {/* Botão para exibir Histórico */}
+          <TouchableOpacity
+            style={[styles.button, styles.smallButton, styles.successButton]}
+            onPress={() => navigation.navigate('Historico', { id_usuario })} // Passa o id_usuario para a tela de Histórico
+          >
+            <Text style={styles.buttonText}>HISTÓRICO</Text>
+          </TouchableOpacity>
+        </View>
 
-      {/* Novo botão para exibir Serviços */}
-      <TouchableOpacity
-        style={styles.servicosButton}
-        onPress={() => navigation.navigate('LojasScreen', { id_usuario })} // Navega para a tela de Serviços
-      >
-        <Text style={styles.servicosButtonText}>AGENDAR UM SERVIÇO</Text>
-      </TouchableOpacity>
+        {/* Botão para agendar um serviço */}
+        <TouchableOpacity
+          style={[styles.button, styles.warningButton]}
+          onPress={() => navigation.navigate('LojasScreen', { id_usuario })} // Navega para a tela de Serviços
+        >
+          <Text style={styles.buttonText}>AGENDAR UM SERVIÇO</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -94,8 +100,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   icon: {
-    width: 100,
-    height: 100,
+    width: 50,
+    height: 50,
     marginLeft: 10,
   },
   welcomeContainer: {
@@ -112,70 +118,56 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000',
   },
-  button: {
+  buttonContainer: {
     backgroundColor: '#000',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
+    padding: 20,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 10,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  button: {
+    paddingVertical: 15,
+    paddingHorizontal: 25,
+    borderRadius: 25,
     alignItems: 'center',
-    marginBottom: 20,
+    marginVertical: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  smallButton: {
+    flex: 1,
+    marginHorizontal: 5,
   },
   buttonText: {
-    color: '#FFB400',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  addButton: {
-    backgroundColor: '#D32F2F',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  addButtonText: {
     color: '#FFF',
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: 'bold',
   },
-  lojasButton: {
-    backgroundColor: '#007BFF',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginBottom: 20,
+  primaryButton: {
+    backgroundColor: '#3498db',
   },
-  lojasButtonText: {
-    color: '#FFF',
-    fontSize: 18,
-    fontWeight: 'bold',
+  dangerButton: {
+    backgroundColor: '#e74c3c',
   },
-  historicoButton: {
-    backgroundColor: '#4CAF50',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginBottom: 20,
+  infoButton: {
+    backgroundColor: '#8e44ad',
   },
-  historicoButtonText: {
-    color: '#FFF',
-    fontSize: 18,
-    fontWeight: 'bold',
+  successButton: {
+    backgroundColor: '#2ecc71',
   },
-  servicosButton: {
-    backgroundColor: '#FF5722',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  servicosButtonText: {
-    color: '#FFF',
-    fontSize: 18,
-    fontWeight: 'bold',
+  warningButton: {
+    backgroundColor: '#f39c12',
   },
 });
 

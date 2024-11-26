@@ -710,26 +710,85 @@ app.get('/api/servicos/pendentes', (req, res) => {
   }
 });
 
+//aconteça oq acontecer NAO MUDE O NOME DESSA ROTA
+app.post('/api/servicos/alterar-status', (req, res) => { 
+  const { id_servico, status } = req.body;
 
-app.post('/api/servicos/concluir', (req, res) => {
+  console.log('Requisição para alterar status do serviço:', id_servico, 'Novo status:', status);
+
+  if (!id_servico || !status) {
+    return res.status(400).json({ message: 'ID do serviço e status são obrigatórios.' });
+  }
+
+  const queryUpdateStatus = `
+    UPDATE Servicos
+    SET status = ?
+    WHERE id_servico = ?
+  `;
+
+  connection.query(queryUpdateStatus, [status, id_servico], (err, results) => {
+    if (err) {
+      console.error('Erro ao atualizar status do serviço:', err);
+      return res.status(500).json({ message: 'Erro ao atualizar status do serviço.' });
+    }
+
+    console.log('Status do serviço atualizado com sucesso:', results);
+
+    // Verificar se a atualização foi bem-sucedida
+    if (results.affectedRows > 0) {
+      if (status === 'Concluído') {
+        const queryInsertHistorico = `
+          INSERT INTO Historico (descricao, data_registro, id_bicicleta, id_servico)
+          SELECT 
+            CONCAT('Serviço concluído: ', t.descricao, ' para a bicicleta ', b.modelo) AS descricao,
+            DATE_FORMAT(NOW(), '%Y-%m-%d') AS data_registro,
+            s.id_bicicleta,
+            s.id_servico
+          FROM Servicos s
+          INNER JOIN TipoServico t ON s.id_tipo_servico = t.id_tipo_servico
+          INNER JOIN Bicicleta b ON s.id_bicicleta = b.id_bicicleta
+          WHERE s.id_servico = ?
+        `;
+
+        connection.query(queryInsertHistorico, [id_servico], (err, results) => {
+          if (err) {
+            console.error('Erro ao inserir no histórico:', err);
+            return res.status(500).json({ message: 'Erro ao registrar no histórico.' });
+          }
+
+          console.log('Dados inseridos no histórico:', results);
+
+          return res.status(200).json({ message: 'Serviço concluído e registrado no histórico com sucesso.' });
+        });
+      } else {
+        return res.status(200).json({ message: 'Status do serviço atualizado com sucesso.' });
+      }
+    } else {
+      return res.status(400).json({ message: 'Falha ao atualizar status do serviço. Verifique os dados.' });
+    }
+  });
+});
+
+// Rota para rejeitar serviço
+app.post('/api/servicos/rejeitar', (req, res) => {
   const { id_servico } = req.body;
+
+  console.log('Requisição recebida para rejeitar serviço com ID:', id_servico);
 
   if (!id_servico) {
     return res.status(400).json({ message: 'ID do serviço é obrigatório.' });
   }
 
-  console.log('ID do serviço recebido:', id_servico);
-
   const queryUpdateServico = `
     UPDATE Servicos
-    SET status = 'Concluido'
+    SET status = 'Cancelado'
     WHERE id_servico = ?
   `;
 
   const queryInsertHistorico = `
     INSERT INTO Historico (descricao, data_registro, id_bicicleta, id_servico)
     SELECT 
-      CONCAT('Serviço concluído: ', t.descricao, ' para a bicicleta ', b.modelo) AS descricao,
+      CONCAT('Serviço cancelado: ', t.descricao, ' para a bicicleta ', b.modelo) AS descricao,
       DATE_FORMAT(NOW(), '%Y-%m-%d') AS data_registro,
       s.id_bicicleta,
       s.id_servico
@@ -742,7 +801,7 @@ app.post('/api/servicos/concluir', (req, res) => {
   connection.query(queryUpdateServico, [id_servico], (err, results) => {
     if (err) {
       console.error('Erro ao atualizar status do serviço:', err);
-      return res.status(500).json({ message: 'Erro ao concluir o serviço.' });
+      return res.status(500).json({ message: 'Erro ao cancelar o serviço.' });
     }
 
     console.log('Status do serviço atualizado com sucesso:', results);
@@ -756,7 +815,7 @@ app.post('/api/servicos/concluir', (req, res) => {
       console.log('Dados inseridos no histórico:', results);
 
       if (results.affectedRows > 0) {
-        return res.status(200).json({ message: 'Serviço concluído e registrado no histórico com sucesso.' });
+        return res.status(200).json({ message: 'Serviço cancelado e registrado no histórico com sucesso.' });
       } else {
         console.warn('Nenhum registro foi adicionado ao histórico.');
         return res.status(400).json({ message: 'Falha ao registrar no histórico. Verifique os dados.' });

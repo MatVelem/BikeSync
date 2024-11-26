@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, Alert, Image, Modal, Picker } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, Alert, Modal, Picker } from 'react-native';
 
 const OrdensAceitas = () => {
   const [servicosPendentes, setServicosPendentes] = useState([]);
@@ -42,7 +42,8 @@ const OrdensAceitas = () => {
       const { id_servico, status } = currentService;
       try {
         console.log('ID do serviço:', id_servico, 'Novo status:', status);
-        const response = await fetch('http://localhost:3000/api/servicos/alterar-status', {
+        const endpoint = status === 'Cancelado' ? 'http://localhost:3000/api/servicos/rejeitar' : 'http://localhost:3000/api/servicos/alterar-status';
+        const response = await fetch(endpoint, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -143,31 +144,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFB400',
     padding: 20,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  logo: {
-    width: 200,
-    height: 100,
-    resizeMode: 'contain',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#000',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
   card: {
     backgroundColor: '#FFF',
     padding: 15,
     borderRadius: 10,
     marginBottom: 20,
-    elevation: 3, // Adiciona sombra no Android
-    shadowColor: '#000', // Adiciona sombra no iOS
+    elevation: 3,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
@@ -197,12 +180,6 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: 'red',
-    textAlign: 'center',
-    marginTop: 20,
-  },
-  noOrders: {
-    fontSize: 18,
-    color: '#000',
     textAlign: 'center',
     marginTop: 20,
   },

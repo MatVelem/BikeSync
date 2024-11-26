@@ -426,6 +426,7 @@ app.get('/valorTotalServicos/:id_lojista', (req, res) => {
 });
 
 
+// Rota para buscar ordens aceitas pelo lojista
 app.get('/api/ordens/aceitas/:id_lojista', (req, res) => {
   const { id_lojista } = req.params;
 
@@ -447,79 +448,58 @@ app.get('/api/ordens/aceitas/:id_lojista', (req, res) => {
   });
 });
 
+app.post('/api/servicos/aceitar', async (req, res) => {
+  try {
+      const { id_ordem_servico } = req.body;
 
+      // 1. Verifique se o id_ordem_servico foi fornecido
+      if (!id_ordem_servico) {
+          return res.status(400).json({ message: 'ID da ordem de serviço é obrigatório.' });
+      }
 
+      // 2. Busque a ordem de serviço no banco
+      connection.query('SELECT * FROM OrdemServico WHERE id_ordem_servico = ?', [id_ordem_servico], (err, results) => {
+          if (err) {
+              console.error('Erro ao buscar a ordem de serviço:', err);
+              return res.status(500).json({ message: 'Erro ao buscar a ordem de serviço.' });
+          }
 
+          if (results.length === 0) {
+              return res.status(404).json({ message: 'Ordem de serviço não encontrada.' });
+          }
 
+          // 3. Insira na tabela Servicos
+          const { valor, id_bicicleta, id_lojista, id_tipo_servico } = results[0];
+          connection.query(
+              'INSERT INTO Servicos (preco, data_servico, status, id_bicicleta, id_lojista, id_tipo_servico) VALUES (?, NOW(), ?, ?, ?, ?)',
+              [valor, 'Pendente', id_bicicleta, id_lojista, id_tipo_servico],
+              (err) => {
+                  if (err) {
+                      console.error('Erro ao inserir serviço:', err);
+                      return res.status(500).json({ message: 'Erro ao registrar o serviço.' });
+                  }
 
-// Rota para aceitar a ordem e inserir na tabela Servicos
-app.post('/api/servicos/aceitar', (req, res) => {
-    const { id_ordem_servico, preco, data_servico, id_bicicleta, id_lojista, id_tipo_servico } = req.body;
+                  // 4. Atualize o status da ordem de serviço (opcional)
+                  connection.query('UPDATE OrdemServico SET status_pagamento = ? WHERE id_ordem_servico = ?', ['Pendente', id_ordem_servico], (err) => {
+                      if (err) {
+                          console.error('Erro ao atualizar ordem de serviço:', err);
+                          return res.status(500).json({ message: 'Erro ao atualizar status da ordem de serviço.' });
+                      }
 
-    // Obter uma conexão do pool
-    pool.getConnection((err, connection) => {
-        if (err) {
-            console.error('Erro ao obter conexão:', err);
-            return res.status(500).json({ error: 'Erro ao obter conexão' });
-        }
+                      res.status(200).json({ message: 'Serviço aceito com sucesso.' });
+                  });
+              }
+          );
+      });
 
-        // Inicia uma transação
-        connection.beginTransaction((err) => {
-            if (err) {
-                connection.release();
-                return res.status(500).json({ error: 'Erro ao iniciar transação' });
-            }
-
-            // Atualizar o status da ordem de serviço
-            const updateOrdemQuery = `
-                UPDATE OrdemServico
-                SET status_pagamento = 'Pendente'
-                WHERE id_ordem_servico = ?
-            `;
-            connection.query(updateOrdemQuery, [id_ordem_servico], (err, result) => {
-                if (err) {
-                    return connection.rollback(() => {
-                        connection.release();
-                        return res.status(500).json({ error: 'Erro ao atualizar ordem de serviço' });
-                    });
-                }
-
-                // Inserir na tabela Servicos
-                const insertServicoQuery = `
-                    INSERT INTO Servicos (preco, data_servico, status, id_bicicleta, id_lojista, id_tipo_servico)
-                    VALUES (?, ?, 'Pendente', ?, ?, ?)
-                `;
-                connection.query(insertServicoQuery, [preco, data_servico, id_bicicleta, id_lojista, id_tipo_servico], (err, result) => {
-                    if (err) {
-                        return connection.rollback(() => {
-                            connection.release();
-                            return res.status(500).json({ error: 'Erro ao registrar serviço' });
-                        });
-                    }
-
-                    // Confirma a transação
-                    connection.commit((err) => {
-                        if (err) {
-                            return connection.rollback(() => {
-                                connection.release();
-                                return res.status(500).json({ error: 'Erro ao confirmar transação' });
-                            });
-                        }
-
-                        connection.release(); // Libera a conexão
-                        res.status(200).json({ message: 'Ordem aceita e serviço registrado com sucesso!' });
-                    });
-                });
-            });
-        });
-    });
+  } catch (err) {
+      console.error('Erro ao aceitar serviço:', err);
+      res.status(500).json({ message: 'Erro interno do servidor.' });
+  }
 });
 
 
-
-
-
-
+// Rota para concluir um serviço
 app.post('/api/servicos/concluir', async (req, res) => {
   const { id_servico, descricao, data_registro } = req.body;
 
@@ -537,7 +517,6 @@ app.post('/api/servicos/concluir', async (req, res) => {
   `;
 
   try {
-      // Insere no histórico
       await new Promise((resolve, reject) =>
           connection.query(queryHistorico, [descricao, data_registro, id_servico], (err) => {
               if (err) reject(err);
@@ -545,7 +524,6 @@ app.post('/api/servicos/concluir', async (req, res) => {
           })
       );
 
-      // Atualiza o status em Servicos
       await new Promise((resolve, reject) =>
           connection.query(queryAtualizarServico, [id_servico], (err) => {
               if (err) reject(err);
@@ -560,8 +538,7 @@ app.post('/api/servicos/concluir', async (req, res) => {
   }
 });
 
-
-
+// Rota para rejeitar uma ordem de serviço
 app.get('/api/ordens/rejeitar', (req, res) => {
   const { id_ordem_servico } = req.query;
 
@@ -575,65 +552,35 @@ app.get('/api/ordens/rejeitar', (req, res) => {
       WHERE id_ordem_servico = ?;
   `;
 
- 
-  app.get('/api/ordens/rejeitar', (req, res) => {
-    const { id_ordem_servico } = req.query;
-  
-    if (!id_ordem_servico) {
-        return res.status(400).json({ message: 'Parâmetro id_ordem_servico é necessário para rejeitar a ordem' });
-    }
-  
-    const updateOrdemQuery = `
-        UPDATE OrdemServico 
-        SET status_pagamento = 'Falhou' 
-        WHERE id_ordem_servico = ?;
-    `;
-  
-   
-    // Iniciar transação
-    connection.beginTransaction((err) => {
-        if (err) {
-            console.error('Erro ao iniciar transação:', err);
-            return res.status(500).json({ message: 'Erro ao iniciar transação' });
-        }
-  
-        // Atualizar tabela OrdemServico
-        connection.query(updateOrdemQuery, [id_ordem_servico], (err, result) => {
-            if (err) {
-                return connection.rollback(() => {
-                    console.error('Erro ao atualizar OrdemServico:', err);
-                    return res.status(500).json({ message: 'Erro ao atualizar OrdemServico' });
-                });
-            }
-  
-            // Atualizar tabela Servicos
-            connection.query(updateServicoQuery, [id_ordem_servico], (err, result) => {
-                if (err) {
-                    return connection.rollback(() => {
-                        console.error('Erro ao atualizar Servicos:', err);
-                        return res.status(500).json({ message: 'Erro ao atualizar Servicos' });
-                    });
-                }
-  
-                // Confirmar transação
-                connection.commit((err) => {
-                    if (err) {
-                        return connection.rollback(() => {
-                            console.error('Erro ao confirmar transação:', err);
-                            return res.status(500).json({ message: 'Erro ao confirmar transação' });
-                        });
-                    }
-  
-                    return res.status(200).json({ message: 'Ordem rejeitada e serviço atualizado para "Cancelado"' });
-                });
-            });
-        });
-    
+  connection.beginTransaction((err) => {
+      if (err) {
+          console.error('Erro ao iniciar transação:', err);
+          return res.status(500).json({ message: 'Erro ao iniciar transação' });
+      }
+
+      connection.query(updateOrdemQuery, [id_ordem_servico], (err) => {
+          if (err) {
+              return connection.rollback(() => {
+                  console.error('Erro ao atualizar OrdemServico:', err);
+                  return res.status(500).json({ message: 'Erro ao atualizar OrdemServico' });
+              });
+          }
+
+          connection.commit((err) => {
+              if (err) {
+                  return connection.rollback(() => {
+                      console.error('Erro ao confirmar transação:', err);
+                      return res.status(500).json({ message: 'Erro ao confirmar transação' });
+                  });
+              }
+
+              return res.status(200).json({ message: 'Ordem rejeitada com sucesso!' });
+          });
       });
   });
 });
 
-// Rota para buscar ordens de serviço pendentes de um lojista
+// Rota para buscar ordens pendentes de um lojista
 app.get('/api/ordens/pendentes/:id_lojista', async (req, res) => {
   const { id_lojista } = req.params;
 
@@ -678,6 +625,7 @@ app.get('/api/ordens/pendentes/:id_lojista', async (req, res) => {
   }
 });
 
+// Rota para buscar detalhes de uma ordem de serviço específica
 app.get('/api/ordens/:id_ordem_servico', async (req, res) => {
   const { id_ordem_servico } = req.params;
 

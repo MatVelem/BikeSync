@@ -23,7 +23,26 @@ const OrdensLojista = ({ route, navigation }) => {
         }
     };
 
-   
+    const aceitarOrdem = async (id_ordem_servico, preco, id_bicicleta, id_tipo_servico) => {
+        try {
+            const response = await axios.post(`http://localhost:3000/api/servicos/aceitar`, {
+                id_ordem_servico,
+                preco, // Preço vindo da ordem
+                data_servico: new Date().toISOString(), // Data atual
+                id_bicicleta, // ID da bicicleta vindo da ordem
+                id_lojista,
+                id_tipo_servico, // Tipo do serviço vindo da ordem
+            });
+
+            if (response.status === 200) {
+                fetchOrdens(); // Atualiza a lista de ordens pendentes
+            } else {
+                setError('Erro ao aceitar ordem');
+            }
+        } catch (err) {
+            setError('Erro ao aceitar ordem');
+        }
+    };
 
     const rejeitarOrdem = async (id_ordem_servico) => {
         try {
@@ -49,7 +68,14 @@ const OrdensLojista = ({ route, navigation }) => {
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
                     style={styles.aceitarButton}
-                    onPress={() => aceitarOrdem(item.id_ordem_servico)}
+                    onPress={() =>
+                        aceitarOrdem(
+                            item.id_ordem_servico,
+                            item.valor, // Preço da ordem
+                            item.id_bicicleta, // ID da bicicleta
+                            item.id_tipo_servico // ID do tipo de serviço
+                        )
+                    }
                 >
                     <Text style={styles.buttonText}>Aceitar</Text>
                 </TouchableOpacity>
@@ -120,6 +146,11 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 5,
         alignItems: 'center',
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
     },
 });
 

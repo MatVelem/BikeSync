@@ -136,7 +136,7 @@ app.get('/api/bicicletas/:id_usuario', (req, res) => {
 });
 
 // Rota para obter detalhes de uma bicicleta específica
-app.get('/api/bicicletas/:id_bicicleta', (req, res) => {
+app.get('/api/bicicletas/detalhes/:id_bicicleta', (req, res) => {
   const { id_bicicleta } = req.params;
 
   const sql = `SELECT b.id_bicicleta, m.nome_marca AS marca, b.modelo, b.ano, b.tamanho_roda, b.serial, b.tipo, b.cor, b.material, b.kit_transmissao, b.tamanho_quadro, b.informacoes_adicionais 
@@ -146,9 +146,15 @@ app.get('/api/bicicletas/:id_bicicleta', (req, res) => {
 
   connection.query(sql, [id_bicicleta], (err, results) => {
     if (err) return res.status(500).json({ error: err });
+    
+    // Verificar se encontrou algum resultado
+    if (!results || results.length === 0) {
+      return res.status(404).json({ error: 'Bicicleta não encontrada' });
+    }
+    
     res.json(results[0]);
   });
-});
+});;
 
 // Rota para obter detalhes de um serviço específico
 app.get('/api/tiposervico/:id_tipo_servico', (req, res) => {

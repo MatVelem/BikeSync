@@ -15,10 +15,28 @@ const ConfirmarServicoScreen = ({ route }) => {
 
   useEffect(() => {
     if (id_bicicleta) {
-      fetch(`http://localhost:3000/api/bicicletas/${id_bicicleta}`)
-        .then(response => response.json())
-        .then(data => setBicicleta(Array.isArray(data) ? data[0] : data))
-        .catch(error => console.error('Erro ao carregar bicicleta:', error));
+      fetch(`http://localhost:3000/api/bicicletas/detalhes/${id_bicicleta}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Erro: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Dados da bicicleta:', data);
+          // Verificar se os dados são válidos antes de atualizar o estado
+          if (data && Object.keys(data).length > 0) {
+            setBicicleta(data);
+          } else {
+            throw new Error('Dados da bicicleta não encontrados');
+          }
+        })
+        .catch(error => {
+          console.error('Erro ao carregar bicicleta:', error);
+          setErro('Não foi possível carregar os dados da bicicleta');
+          // Garantir que bicicleta seja null se houver erro
+          setBicicleta(null);
+        });
     }
   
     if (id_tipo_servico) {

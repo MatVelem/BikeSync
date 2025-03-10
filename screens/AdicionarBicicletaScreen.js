@@ -9,10 +9,12 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Picker
+  Picker,
+  Dimensions
 } from 'react-native';
 
-const AdicionarBicicletaScreen = ({ navigation }) => {
+const AdicionarBicicletaScreen = ({ navigation, route }) => {
+  const {id_usuario} = route.params || {};
   const [marcas, setMarcas] = useState([]);
   const [marcaSelecionada, setMarcaSelecionada] = useState('');
   const [modelo, setModelo] = useState('');
@@ -25,6 +27,9 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
   const [kitTransmissao, setKitTransmissao] = useState('');
   const [tamanhoQuadro, setTamanhoQuadro] = useState('');
   const [informacoesAdicionais, setInformacoesAdicionais] = useState('');
+
+  const windowWidth = Dimensions.get('window').width;
+  const contentWidth = Math.max(windowWidth, 600); // Força uma largura mínima para garantir rolagem horizontal
 
   useEffect(() => {
     const fetchMarcas = async () => {
@@ -78,7 +83,7 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
       kit_transmissao: kitTransmissao,
       tamanho_quadro: tamanhoQuadro,
       informacoes_adicionais: informacoesAdicionais,
-      id_usuario: 1,
+      id_usuario: id_usuario,
     };
 
     try {
@@ -94,7 +99,7 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
         Alert.alert('Sucesso', 'Bicicleta adicionada com sucesso!');
         navigation.navigate('MinhasBicicletas');
       } else {
-        const errorResponse = await response.json(); // Obter a resposta de erro
+        const errorResponse = await response.json();
         Alert.alert('Erro', errorResponse.message || 'Não foi possível adicionar a bicicleta.');
       }
     } catch (error) {
@@ -108,105 +113,147 @@ const AdicionarBicicletaScreen = ({ navigation }) => {
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.container}>
-          <Button title="Adicionar Bicicleta" onPress={handleAdicionarBicicleta} color="#000" />
+      <ScrollView 
+        horizontal={true} 
+        contentContainerStyle={[styles.scrollContainerHorizontal, { width: contentWidth }]}
+      >
+        <ScrollView vertical={true} contentContainerStyle={styles.scrollContainerVertical}>
+          <View style={styles.container}>
+            <Text style={styles.titulo}>Adicionar Bicicleta</Text>
+            
+            <View style={styles.rowContainer}>
+              <View style={styles.fieldContainer}>
+                <Text style={styles.label}>Marca*:</Text>
+                <Picker
+                  selectedValue={marcaSelecionada}
+                  style={styles.picker}
+                  onValueChange={(itemValue) => setMarcaSelecionada(itemValue)}
+                >
+                  <Picker.Item label="Selecione uma marca" value="" />
+                  {marcas.map((marca) => (
+                    <Picker.Item key={marca.id_marca} label={marca.nome_marca} value={marca.id_marca} />
+                  ))}
+                </Picker>
+              </View>
+              
+              <View style={styles.fieldContainer}>
+                <Text style={styles.label}>Modelo*:</Text>
+                <TextInput
+                  style={styles.input}
+                  value={modelo}
+                  onChangeText={setModelo}
+                  placeholder="Modelo"
+                />
+              </View>
+            </View>
 
-          <Text style={styles.label}>Marca*:</Text>
-          <Picker
-            selectedValue={marcaSelecionada}
-            style={styles.picker}
-            onValueChange={(itemValue) => setMarcaSelecionada(itemValue)}
-          >
-            <Picker.Item label="Selecione uma marca" value="" />
-            {marcas.map((marca) => (
-              <Picker.Item key={marca.id_marca} label={marca.nome_marca} value={marca.id_marca} />
-            ))}
-          </Picker>
+            <View style={styles.rowContainer}>
+              <View style={styles.fieldContainer}>
+                <Text style={styles.label}>Ano*:</Text>
+                <TextInput
+                  style={styles.input}
+                  value={ano}
+                  onChangeText={setAno}
+                  keyboardType="numeric"
+                  placeholder="Ano"
+                />
+              </View>
+              
+              <View style={styles.fieldContainer}>
+                <Text style={styles.label}>Tamanho da Roda*:</Text>
+                <TextInput
+                  style={styles.input}
+                  value={tamanhoRoda}
+                  onChangeText={setTamanhoRoda}
+                  keyboardType="numeric"
+                  placeholder="Tamanho da Roda"
+                />
+              </View>
+            </View>
 
-          <Text style={styles.label}>Modelo*:</Text>
-          <TextInput
-            style={styles.input}
-            value={modelo}
-            onChangeText={setModelo}
-            placeholder="Modelo"
-          />
+            <View style={styles.rowContainer}>
+              <View style={styles.fieldContainer}>
+                <Text style={styles.label}>Serial*:</Text>
+                <TextInput
+                  style={styles.input}
+                  value={serial}
+                  onChangeText={setSerial}
+                  placeholder="Serial"
+                />
+              </View>
+              
+              <View style={styles.fieldContainer}>
+                <Text style={styles.label}>Tipo:</Text>
+                <TextInput
+                  style={styles.input}
+                  value={tipo}
+                  onChangeText={setTipo}
+                  placeholder="Tipo"
+                />
+              </View>
+            </View>
 
-          <Text style={styles.label}>Ano*:</Text>
-          <TextInput
-            style={styles.input}
-            value={ano}
-            onChangeText={setAno}
-            keyboardType="numeric"
-            placeholder="Ano"
-          />
+            <View style={styles.rowContainer}>
+              <View style={styles.fieldContainer}>
+                <Text style={styles.label}>Cor:</Text>
+                <TextInput
+                  style={styles.input}
+                  value={cor}
+                  onChangeText={setCor}
+                  placeholder="Cor"
+                />
+              </View>
+              
+              <View style={styles.fieldContainer}>
+                <Text style={styles.label}>Material:</Text>
+                <TextInput
+                  style={styles.input}
+                  value={material}
+                  onChangeText={setMaterial}
+                  placeholder="Material"
+                />
+              </View>
+            </View>
 
-          <Text style={styles.label}>Tamanho da Roda*:</Text>
-          <TextInput
-            style={styles.input}
-            value={tamanhoRoda}
-            onChangeText={setTamanhoRoda}
-            keyboardType="numeric"
-            placeholder="Tamanho da Roda"
-          />
+            <View style={styles.rowContainer}>
+              <View style={styles.fieldContainer}>
+                <Text style={styles.label}>Kit de Transmissão:</Text>
+                <TextInput
+                  style={styles.input}
+                  value={kitTransmissao}
+                  onChangeText={setKitTransmissao}
+                  placeholder="Kit de Transmissão"
+                />
+              </View>
+              
+              <View style={styles.fieldContainer}>
+                <Text style={styles.label}>Tamanho do Quadro:</Text>
+                <TextInput
+                  style={styles.input}
+                  value={tamanhoQuadro}
+                  onChangeText={setTamanhoQuadro}
+                  placeholder="Tamanho do Quadro"
+                />
+              </View>
+            </View>
 
-          <Text style={styles.label}>Serial*:</Text>
-          <TextInput
-            style={styles.input}
-            value={serial}
-            onChangeText={setSerial}
-            placeholder="Serial"
-          />
+            <Text style={styles.label}>Informações Adicionais:</Text>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              value={informacoesAdicionais}
+              onChangeText={setInformacoesAdicionais}
+              multiline
+              placeholder="Informações Adicionais"
+            />
 
-          <Text style={styles.label}>Tipo:</Text>
-          <TextInput
-            style={styles.input}
-            value={tipo}
-            onChangeText={setTipo}
-            placeholder="Tipo"
-          />
-
-          <Text style={styles.label}>Cor:</Text>
-          <TextInput
-            style={styles.input}
-            value={cor}
-            onChangeText={setCor}
-            placeholder="Cor"
-          />
-
-          <Text style={styles.label}>Material:</Text>
-          <TextInput
-            style={styles.input}
-            value={material}
-            onChangeText={setMaterial}
-            placeholder="Material"
-          />
-
-          <Text style={styles.label}>Kit de Transmissão:</Text>
-          <TextInput
-            style={styles.input}
-            value={kitTransmissao}
-            onChangeText={setKitTransmissao}
-            placeholder="Kit de Transmissão"
-          />
-
-          <Text style={styles.label}>Tamanho do Quadro:</Text>
-          <TextInput
-            style={styles.input}
-            value={tamanhoQuadro}
-            onChangeText={setTamanhoQuadro}
-            placeholder="Tamanho do Quadro"
-          />
-
-          <Text style={styles.label}>Informações Adicionais:</Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            value={informacoesAdicionais}
-            onChangeText={setInformacoesAdicionais}
-            multiline
-            placeholder="Informações Adicionais"
-          />
-        </View>
+            <Button 
+              title="Adicionar Bicicleta" 
+              onPress={handleAdicionarBicicleta} 
+              color="#000" 
+              style={styles.botaoAdicionar}
+            />
+          </View>
+        </ScrollView>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -216,7 +263,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#FFB400', // Cor de fundo atualizada
+    backgroundColor: '#FFB400',
+  },
+  titulo: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  scrollContainerHorizontal: {
+    flexGrow: 1,
+  },
+  scrollContainerVertical: {
+    paddingBottom: 20,
+  },
+  rowContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  fieldContainer: {
+    flex: 1,
+    marginRight: 10,
   },
   label: {
     color: '#333',
@@ -236,16 +305,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#333',
     borderRadius: 5,
-    backgroundColor: '#000', // Fundo preto para o Picker
-    color: '#fff', // Texto branco
+    backgroundColor: '#000',
+    color: '#fff',
     marginBottom: 15,
+    height: 50,
   },
   textArea: {
     height: 100,
   },
-  scrollContainer: {
-    paddingBottom: 20,
-  },
+  botaoAdicionar: {
+    marginTop: 20,
+    marginBottom: 20,
+  }
 });
 
 export default AdicionarBicicletaScreen;

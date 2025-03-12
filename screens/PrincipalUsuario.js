@@ -41,7 +41,7 @@ const PrincipalUsuario = ({ navigation, route }) => {
           {/* Botão "Adicionar Nova Bicicleta" */}
           <TouchableOpacity
             style={[styles.button, styles.smallButton, styles.dangerButton]}
-            onPress={() => navigation.navigate('AdicionarBicicleta', { id_usuario })} // Passa o id_usuario para a tela de Adicionar Bicicleta
+            onPress={() => navigation.navigate('AdicionarBicicleta', { id_usuario, nome })} // Passa o id_usuario para a tela de Adicionar Bicicleta
           >
             <Text style={styles.buttonText}>NOVA BICICLETA +</Text>
           </TouchableOpacity>

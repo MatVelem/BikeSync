@@ -160,8 +160,8 @@ const AdicionarBicicletaScreen = ({ navigation, route }) => {
         const timer = setTimeout(() => {
           setShowSuccessModal(false);
           navigation.navigate('PrincipalUsuario', {
-            nome: route.params?.nome || 'Usuário',  // Adicionando o nome que está faltando
-            id_usuario: id_usuario  // Este já está sendo passado corretamente
+            nome: nome, // Use a variável nome que vem de route.params
+            id_usuario: id_usuario
           });
         }, 6000);
         
@@ -187,10 +187,10 @@ const AdicionarBicicletaScreen = ({ navigation, route }) => {
     // Fechar o modal e navegar para PrincipalUsuario com os parâmetros corretos
     setShowSuccessModal(false);
     navigation.navigate('PrincipalUsuario', {
-      nome: route.params?.nome || 'Usuário',
-      id_usuario: id_usuario
-    });
-  };
+    nome: nome, 
+    id_usuario: id_usuario
+  });
+};
 
   // Funções para seleção de marca
   const handleSelectMarca = (item) => {
